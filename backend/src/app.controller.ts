@@ -5,8 +5,8 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/openapi')
-  openAPI(): string {
-    return this.appService.openAPI();
+  @Get('/')
+  status(): Record<string, any> {
+    return this.appService.status();
   }
 }
