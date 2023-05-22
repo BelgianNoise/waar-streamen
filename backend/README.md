@@ -45,8 +45,10 @@ content-type: application/json;charset=UTF-8
 ### VTM GO :
 ```http
 GET https://vtm.be/vtmgo/zoeken?query=blind
-```
 
+cookie: <cookie>
+```
+Requires cookie to not be lead to the home page. Cookie is currently hardcoded (not sure if that will keep working), def room for improvement.
 ### VRT MAX :
 ```http
 POST https://www.vrt.be/vrtnu-api/graphql/v1
