@@ -4,6 +4,9 @@ import { Retriever } from './Retriever';
 import { GoPlayRetriever } from './retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retrievers/VtmGoRetriever';
 
+/**
+ * Class that is responsible for retrieving entries from all platforms.
+ */
 @Injectable()
 export class RetrieverManager {
   private readonly retrievers: Retriever[];

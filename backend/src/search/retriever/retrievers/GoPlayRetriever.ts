@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { parseLanguage } from '../../../models/Language';
+import { EntriesInMemoryExpiringCache } from '../../cache/EntriesInMemoryExpiringCache';
 import parse from 'node-html-parser';
 
+/**
+ * Retrieves entries from GoPlay.
+ */
 @Injectable()
 export class GoPlayRetriever extends Retriever {
-  constructor() {
-    super('https://api.goplay.be/search', 'GoPlay');
+  constructor(protected readonly cacheService: EntriesInMemoryExpiringCache) {
+    super('https://api.goplay.be/search', 'GoPlay', cacheService);
   }
 
   async retrieve(searchTerm: string): Promise<Entry[]> {

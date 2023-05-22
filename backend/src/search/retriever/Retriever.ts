@@ -1,19 +1,18 @@
 import { Entry } from '../../models/Entry';
 import { Platform } from '../../models/Platform';
+import { Cache } from '../../util/cache/Cache';
 
+/**
+ * Abstract class for retrieving entries from a given platform.
+ */
 export abstract class Retriever {
-  private cache: Map<string, { lastUpdated: string; entries: Entry[] }>;
-  private readonly cacheExpirationMinutes: number;
   private readonly enableCache: boolean;
 
   constructor(
     protected readonly baseSearchUrl: string,
     protected readonly platform: Platform,
+    protected readonly cacheService: Cache<string, Entry[]>,
   ) {
-    this.cache = new Map();
-    this.cacheExpirationMinutes = Number(
-      process.env.CACHE_EXPIRATION_MINUTES || 24 * 60,
-    );
     this.enableCache = process.env.ENABLE_CACHE === 'true';
   }
 
@@ -22,10 +21,11 @@ export abstract class Retriever {
   public async search(searchTerm: string): Promise<Entry[]> {
     try {
       if (this.enableCache) {
-        const cached = await this.tryCache(searchTerm);
+        const cacheKey = `${this.platform}-${searchTerm}}`;
+        const cached = await this.cacheService.get(cacheKey);
         if (cached !== undefined) return cached;
         const retrieved = await this.retrieve(searchTerm);
-        await this.saveToCache(searchTerm, retrieved);
+        await this.cacheService.set(cacheKey, retrieved);
         return retrieved;
       } else {
         return this.retrieve(searchTerm);
@@ -47,32 +47,5 @@ export abstract class Retriever {
         },
       ];
     }
-  }
-
-  private async tryCache(searchTerm: string): Promise<Entry[] | undefined> {
-    const cached = this.cache.get(searchTerm);
-    if (!cached) return undefined;
-
-    const now = new Date().getTime();
-    const lastUpdated = new Date(cached.lastUpdated).getTime();
-    const diff = now - lastUpdated;
-    const minutes = Math.floor(diff / 1000 / 60);
-    if (minutes > this.cacheExpirationMinutes) {
-      // Cache has expired
-      this.cache.delete(searchTerm);
-      return undefined;
-    }
-
-    return cached.entries;
-  }
-
-  private async saveToCache(
-    searchTerm: string,
-    entries: Entry[],
-  ): Promise<void> {
-    this.cache.set(searchTerm, {
-      lastUpdated: new Date().toISOString(),
-      entries,
-    });
   }
 }

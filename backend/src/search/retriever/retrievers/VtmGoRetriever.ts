@@ -2,15 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { parseLanguage } from '../../../models/Language';
+import { EntriesInMemoryExpiringCache } from '../../cache/EntriesInMemoryExpiringCache';
 import parse from 'node-html-parser';
 
+/**
+ * Retrieves entries from VTM Go.
+ */
 @Injectable()
 export class VtmGoRetriever extends Retriever {
   private cookie =
     'ak_bmsc=5B4BF33808FE4F21B45D8D46F3E88EB3~000000000000000000000000000000~YAAQfMQRAgOs+wKIAQAAuD7uRBMVY+u7bXEvkbv71hrtZ0hH6aIIxSPeGKy1lOCDq3LxMT3tqQPGsRd4xlAsxF2NcRa5zPWmRht/S0Jx8VAWHXSh5t4QFwK8wgQ5LTfJrzrYkSHi5dWFpCHuLIWOs2n3xmWtOFN9hC5/dPkTv5MHV5WPoeV6HomZTvR+pCjGqbBD3RCOYkUP0LtwtADo2SNlgFFGqaWNYMSZV+2+CdXIc2WLVyo/N+k5C559+OoL2+nKEOG6uaB34CqsLmAbe6+WN+T68+x0SLp3gjepCYaj1TC8HIJURNbFp68isXNHDICkFWeOh2LO82C5GczhfYi/tnSzvaaMSq9EHnRHGoCT4qB/vxZbJCY3hjUL0Nz5NPs+Tow=; authId=8559bdab-a5b7-4ca5-8002-9e517888d146; bm_sv=63C3A3F8D82A676A4D1DFBDF84EA41E7~YAAQfMQRAqSx+wKIAQAAAETvRBP+QRJSSiRYgj1XY3LtPrTwdOE7M0DiRoDJ+QX3in88GGd9Esdg6NavvhW4W/liuOfvtOeiSq2UK/QhKco6At9PfoqJ/nfh87m3GW2YrG0ckMi7oiGhd9LqYkGQ2EjGRvDY6DDcDvgyOLd4QEhSWw+nPXHgVr10qy++gvz/0p4kQRzSfyhHWxRM67d1/5jIVEKjT04zToMsczbEl391Abtyev3dB+zjX0o=~1';
 
-  constructor() {
-    super('https://vtm.be/vtmgo/zoeken', 'VTM GO');
+  constructor(protected readonly cacheService: EntriesInMemoryExpiringCache) {
+    super('https://vtm.be/vtmgo/zoeken', 'VTM GO', cacheService);
   }
 
   async retrieve(searchTerm: string): Promise<Entry[]> {

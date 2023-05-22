@@ -4,9 +4,16 @@ import { SearchService } from './search.service';
 import { RetrieverManager } from './retriever/RetrieverManager';
 import { GoPlayRetriever } from './retriever/retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retriever/retrievers/VtmGoRetriever';
+import { EntriesInMemoryExpiringCache } from './cache/EntriesInMemoryExpiringCache';
 
 @Module({
   controllers: [SearchController],
-  providers: [SearchService, RetrieverManager, GoPlayRetriever, VtmGoRetriever],
+  providers: [
+    SearchService,
+    EntriesInMemoryExpiringCache,
+    RetrieverManager,
+    GoPlayRetriever,
+    VtmGoRetriever,
+  ],
 })
 export class SearchModule {}
