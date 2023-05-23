@@ -33,8 +33,12 @@ export class VtmGoRetriever extends Retriever {
     }
 
     const text = await result.text();
-    const parsed = parse(text);
 
+    if (text.includes('Beleef meer dankzij cookies!')) {
+      throw new Error('Cookie consent required');
+    }
+
+    const parsed = parse(text);
     const items = parsed.querySelectorAll(
       'ol[data-title="Zoekresultaten"] .search__item',
     );
