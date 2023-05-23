@@ -11,7 +11,7 @@ Data returned by the server might not be correct, this is solely because the str
   - Retrieveing a full list of avaiable episodes is too resource intensive, only the available seasons are returned, where possible.
   - Language is not always reported
 - [x] Streamz
- - Retrieveing a full list of avaiable episodes is too resource intensive, only the available seasons are returned, where possible.
+  - Retrieveing a full list of avaiable episodes is too resource intensive, only the available seasons are returned, where possible.
   - Language is not always reported
 - [ ] VRT MAX
 - [ ] NPO Start
