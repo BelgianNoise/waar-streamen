@@ -1,12 +1,15 @@
 # waar-streamen
 
-A web app to search for movies and series on (mainly flemish/dutch) streaming services.
+A web app to search for movies and series on (mainly flemish/dutch) streaming services supported by a custom backend.
 Data returned by the server might not be correct, this is solely because the streaming services don't report the correct data themselves. (f.e.: language is falsely reported as 'en' by GoPlay on dutch programs)
 
 ## Supported streaming services
 
 - [x] GoPlay
-- [ ] VTM GO
+  - Language is not always (correctly) reported
+- [x] VTM GO
+  - Retrieveing a full list of avaiable episodes is too resource intensive, only the available seasons are returned, where possible.
+  - Language is not always reported
 - [ ] VRT MAX
 - [ ] NPO Start
 
