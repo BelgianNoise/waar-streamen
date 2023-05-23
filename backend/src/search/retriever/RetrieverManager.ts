@@ -3,6 +3,7 @@ import { Entry } from '../../models/Entry';
 import { Retriever } from './Retriever';
 import { GoPlayRetriever } from './retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retrievers/VtmGoRetriever';
+import { StreamzRetriever } from './retrievers/StreamzRetriever';
 
 /**
  * Class that is responsible for retrieving entries from all platforms.
@@ -14,8 +15,13 @@ export class RetrieverManager {
   constructor(
     private readonly goPlayRetriever: GoPlayRetriever,
     private readonly vtmGoRetriever: VtmGoRetriever,
+    private readonly streamzRetriever: StreamzRetriever,
   ) {
-    this.retrievers = [this.goPlayRetriever, this.vtmGoRetriever];
+    this.retrievers = [
+      this.goPlayRetriever,
+      this.vtmGoRetriever,
+      this.streamzRetriever,
+    ];
   }
 
   async retrieveAll(searchTerm: string): Promise<Entry[]> {

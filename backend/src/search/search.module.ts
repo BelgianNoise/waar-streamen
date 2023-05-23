@@ -5,6 +5,7 @@ import { RetrieverManager } from './retriever/RetrieverManager';
 import { GoPlayRetriever } from './retriever/retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retriever/retrievers/VtmGoRetriever';
 import { EntriesInMemoryExpiringCache } from './cache/EntriesInMemoryExpiringCache';
+import { StreamzRetriever } from './retriever/retrievers/StreamzRetriever';
 
 @Module({
   controllers: [SearchController],
@@ -14,6 +15,7 @@ import { EntriesInMemoryExpiringCache } from './cache/EntriesInMemoryExpiringCac
     RetrieverManager,
     GoPlayRetriever,
     VtmGoRetriever,
+    StreamzRetriever,
   ],
 })
 export class SearchModule {}

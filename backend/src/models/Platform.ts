@@ -1,1 +1,1 @@
-export type Platform = 'GoPlay' | 'VTM GO';
+export type Platform = 'GoPlay' | 'VTM GO' | 'Streamz';
