@@ -55,7 +55,7 @@ export class VrtMaxRetriever extends Retriever {
         title: edge.node.title,
         description: edge.node.description,
         imageUrl: edge.node.image.templateUri,
-        link: edge.node.link, // link is not yet the correct value
+        link: edge.node.link, // link is not yet the correct value (/vrtnu/a-z/<name>/)
         language: '-',
         seasons: new Map(),
       };

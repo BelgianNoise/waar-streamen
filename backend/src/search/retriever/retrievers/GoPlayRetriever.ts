@@ -107,7 +107,7 @@ interface GoPlayFetchResponse {
         };
         type: string;
         url: string;
-      }
+      };
     }[];
   };
   timed_out: boolean;
