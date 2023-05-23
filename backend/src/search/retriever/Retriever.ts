@@ -31,7 +31,7 @@ export abstract class Retriever {
         return await this.retrieve(searchTerm);
       }
     } catch (e: unknown) {
-      console.error(`Error while searching ${searchTerm}`, e);
+      console.error(`Error while searching "${searchTerm}"`, e);
       return [
         {
           platform: this.platform,
