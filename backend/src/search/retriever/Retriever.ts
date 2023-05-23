@@ -28,13 +28,10 @@ export abstract class Retriever {
         await this.cacheService.set(cacheKey, retrieved);
         return retrieved;
       } else {
-        return this.retrieve(searchTerm);
+        return await this.retrieve(searchTerm);
       }
     } catch (e: unknown) {
-      console.error(
-        `Error while searching ${searchTerm} on ${this.platform}`,
-        e,
-      );
+      console.error(`Error while searching ${searchTerm}`, e);
       return [
         {
           platform: this.platform,
@@ -42,7 +39,7 @@ export abstract class Retriever {
           description: '',
           imageUrl: '',
           link: '',
-          language: 'en',
+          language: '-',
           seasons: new Map(),
         },
       ];
