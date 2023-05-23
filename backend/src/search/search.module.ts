@@ -6,6 +6,7 @@ import { GoPlayRetriever } from './retriever/retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retriever/retrievers/VtmGoRetriever';
 import { EntriesInMemoryExpiringCache } from './cache/EntriesInMemoryExpiringCache';
 import { StreamzRetriever } from './retriever/retrievers/StreamzRetriever';
+import { VrtMaxRetriever } from './retriever/retrievers/VrtMaxRetriever';
 
 @Module({
   controllers: [SearchController],
@@ -16,6 +17,7 @@ import { StreamzRetriever } from './retriever/retrievers/StreamzRetriever';
     GoPlayRetriever,
     VtmGoRetriever,
     StreamzRetriever,
+    VrtMaxRetriever,
   ],
 })
 export class SearchModule {}

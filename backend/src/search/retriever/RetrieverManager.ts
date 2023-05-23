@@ -4,6 +4,7 @@ import { Retriever } from './Retriever';
 import { GoPlayRetriever } from './retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retrievers/VtmGoRetriever';
 import { StreamzRetriever } from './retrievers/StreamzRetriever';
+import { VrtMaxRetriever } from './retrievers/VrtMaxRetriever';
 
 /**
  * Class that is responsible for retrieving entries from all platforms.
@@ -16,11 +17,13 @@ export class RetrieverManager {
     private readonly goPlayRetriever: GoPlayRetriever,
     private readonly vtmGoRetriever: VtmGoRetriever,
     private readonly streamzRetriever: StreamzRetriever,
+    private readonly vrtMaxRetriever: VrtMaxRetriever,
   ) {
     this.retrievers = [
       this.goPlayRetriever,
       this.vtmGoRetriever,
       this.streamzRetriever,
+      this.vrtMaxRetriever,
     ];
   }
 
