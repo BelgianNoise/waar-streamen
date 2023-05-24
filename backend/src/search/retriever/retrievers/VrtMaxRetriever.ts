@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
-import { parseLanguage } from '../../../models/Language';
 import { EntriesInMemoryExpiringCache } from '../../cache/EntriesInMemoryExpiringCache';
-import { vrtMaxQuery } from '../../variables/VrtMaxQuery';
+import {
+  vrtMaxDetailsQuery,
+  vrtMaxListQuery,
+  vrtMaxSearchQuery,
+} from '../../variables/VrtMaxQueries';
 
 /**
  * Retrieves entries from VRT MAX.
@@ -11,30 +14,31 @@ import { vrtMaxQuery } from '../../variables/VrtMaxQuery';
 @Injectable()
 export class VrtMaxRetriever extends Retriever {
   constructor(protected readonly cacheService: EntriesInMemoryExpiringCache) {
-    super('https://www.vrt.be/vrtnu-api/graphql/v1', 'VRT MAX', cacheService);
+    super(
+      'https://www.vrt.be/vrtnu-api/graphql/public/v1',
+      'VRT MAX',
+      cacheService,
+    );
   }
 
   async retrieve(searchTerm: string): Promise<Entry[]> {
-    const result = await fetch(
-      'https://www.vrt.be/vrtnu-api/graphql/public/v1',
-      {
-        method: 'POST',
-        headers: {
-          accept: 'application/json',
-          'content-type': 'application/json',
-          'x-vrt-client-name': 'WEB',
-        },
-        body: JSON.stringify({
-          operationName: 'Search',
-          variables: {
-            q: searchTerm,
-            mediaType: 'all',
-            facets: null,
-          },
-          query: vrtMaxQuery,
-        }),
+    const result = await fetch(this.baseSearchUrl, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-vrt-client-name': 'WEB',
       },
-    );
+      body: JSON.stringify({
+        operationName: 'Search',
+        variables: {
+          q: searchTerm,
+          mediaType: 'all',
+          facets: null,
+        },
+        query: vrtMaxSearchQuery,
+      }),
+    });
 
     if (!result.ok || result.status !== 200) {
       throw new Error(`Status (${result.status})`);
@@ -44,7 +48,7 @@ export class VrtMaxRetriever extends Retriever {
       throw new Error(`Content-Type: ${result.headers.get('content-type')}`);
     }
 
-    const json = (await result.json()) as unknown as VrtMaxFetchResponse;
+    const json = (await result.json()) as unknown as VrtMaxSearchFetchResponse;
     const items = json.data.uiSearch[0].items;
     const item = items.find((item) => item.title.includes('Kijk'));
     if (!item) throw new Error('Response parsing failed');
@@ -55,7 +59,7 @@ export class VrtMaxRetriever extends Retriever {
         title: edge.node.title,
         description: edge.node.description,
         imageUrl: edge.node.image.templateUrl,
-        link: edge.node.link, // link is not yet the correct value (/vrtnu/a-z/<name>/)
+        link: `https://www.vrt.be${edge.node.link}`,
         language: '-',
         seasons: new Map(),
       };
@@ -63,11 +67,116 @@ export class VrtMaxRetriever extends Retriever {
       return entry;
     });
 
-    return entries;
+    const entriesWithEpisodes = entries.map(async (entry): Promise<Entry> => {
+      const id = new URL(entry.link).pathname.replace(/\/$/, '');
+      const result = await fetch(this.baseSearchUrl, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          'x-vrt-client-name': 'WEB',
+        },
+        body: JSON.stringify({
+          operationName: 'VideoProgramPage',
+          variables: {
+            pageId: `${id}.model.json`,
+          },
+          query: vrtMaxDetailsQuery,
+        }),
+      });
+
+      const json =
+        (await result.json()) as unknown as VrtMaxDetailsFetchResponse;
+      const items = json.data.page.components[1].items;
+      const aflItem = items.find((item) =>
+        item.title.toLowerCase().includes('afleveringen'),
+      );
+      if (!aflItem) return entry;
+      const seasonItems = aflItem.components[0].items;
+      for (const seasonItem of seasonItems) {
+        // Set season
+        const title = seasonItem.title;
+        const seasonString = title.match(/Seizoen (\d+)/)?.[1];
+        if (!seasonString) continue;
+        const seasonInt = parseInt(seasonString);
+        entry.seasons.set(seasonInt, new Set());
+
+        const paginated = seasonItem.components[0].paginatedItems;
+        const listId = seasonItem.components[0].listId;
+        if (paginated) {
+          // This contains all episodes already
+          for (const edge of paginated.edges) {
+            const parsedMeta = this.parsePrimaryMeta(edge.node.primaryMeta);
+            if (!parsedMeta) continue;
+            entry.seasons
+              .get(parseInt(parsedMeta.season))
+              ?.add(parseInt(parsedMeta.episode));
+          }
+        } else if (listId) {
+          // These seasons require further requests to get the episodes
+          const episodeNumbers = await this.retrieveExtraEpisodes(listId);
+          for (const episodeNumber of episodeNumbers) {
+            entry.seasons.get(seasonInt)?.add(episodeNumber);
+          }
+        }
+      }
+
+      return entry;
+    });
+
+    return Promise.all(entriesWithEpisodes);
+  }
+
+  private async retrieveExtraEpisodes(listId: string): Promise<number[]> {
+    const result: number[] = [];
+
+    const response = await fetch(this.baseSearchUrl, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/json',
+        'x-vrt-client-name': 'WEB',
+      },
+      body: JSON.stringify({
+        operationName: 'ProgramSeasonEpisodeList',
+        variables: {
+          listId: listId,
+        },
+        query: vrtMaxListQuery,
+      }),
+    });
+
+    const json = (await response.json()) as unknown as VrtMaxListFetchResponse;
+    const items = json.data.list.items;
+    for (const item of items) {
+      const parsedMeta = this.parsePrimaryMeta(item.primaryMeta);
+      if (!parsedMeta) continue;
+      result.push(parseInt(parsedMeta.episode));
+    }
+    return result;
+  }
+
+  private parsePrimaryMeta(
+    primaryMeta: {
+      value: string;
+    }[],
+  ): { season: string; episode: string } | undefined {
+    const episodeText = primaryMeta.find((meta) =>
+      meta.value.toLowerCase().includes('aflevering'),
+    );
+    if (!episodeText) return undefined;
+    const seasonText = primaryMeta.find((meta) =>
+      meta.value.toLowerCase().includes('seizoen'),
+    );
+    if (!seasonText) return undefined;
+    const season = seasonText.value.match(/(\d+)/)?.[1];
+    const episode = episodeText.value.match(/(\d+)/)?.[1];
+    if (!season || !episode) return undefined;
+    return { season, episode };
   }
 }
 
-interface VrtMaxFetchResponse {
+interface VrtMaxSearchFetchResponse {
   data: {
     uiSearch: {
       items: {
@@ -89,5 +198,50 @@ interface VrtMaxFetchResponse {
         }[];
       }[];
     }[];
+  };
+}
+
+interface VrtMaxDetailsFetchResponse {
+  data: {
+    page: {
+      components: {
+        items: {
+          title: string;
+          components: {
+            items: {
+              title: string;
+              components: {
+                // ListId is always present but only usefull when
+                // potentionally retrieveing the episodes in the future
+                listId?: string;
+                // PaginatedItems is only present for 1 season
+                paginatedItems?: {
+                  edges: {
+                    node: {
+                      title: string;
+                      primaryMeta: {
+                        value: string;
+                      }[];
+                    };
+                  }[];
+                };
+              }[];
+            }[];
+          }[];
+        }[];
+      }[];
+    };
+  };
+}
+
+interface VrtMaxListFetchResponse {
+  data: {
+    list: {
+      items: {
+        primaryMeta: {
+          value: string;
+        }[];
+      }[];
+    };
   };
 }
