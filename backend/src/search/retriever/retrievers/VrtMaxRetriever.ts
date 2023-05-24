@@ -97,6 +97,7 @@ export class VrtMaxRetriever extends Retriever {
       const json =
         (await result.json()) as unknown as VrtMaxDetailsFetchResponse;
       const items = json.data.page.components[1].items;
+      if (!items) return entry;
       const aflItem = items.find((item) =>
         item.title.toLowerCase().includes('afleveringen'),
       );
