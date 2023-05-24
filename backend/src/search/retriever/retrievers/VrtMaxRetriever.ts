@@ -50,6 +50,7 @@ export class VrtMaxRetriever extends Retriever {
 
     const json = (await result.json()) as unknown as VrtMaxSearchFetchResponse;
     const items = json.data.uiSearch[0].items;
+    if (!items) throw new Error('Response parsing failed');
     const item = items.find((item) => item.title.includes('Kijk'));
     if (!item) throw new Error('Response parsing failed');
     const edges = item.components[0].paginatedItems.edges;
@@ -67,7 +68,15 @@ export class VrtMaxRetriever extends Retriever {
       return entry;
     });
 
-    const entriesWithEpisodes = entries.map(async (entry): Promise<Entry> => {
+    const entriesWithEpisodes = entries.map((entry) =>
+      this.retrieveEpisodes(entry),
+    );
+
+    return Promise.all(entriesWithEpisodes);
+  }
+
+  private async retrieveEpisodes(entry: Entry): Promise<Entry> {
+    try {
       const id = new URL(entry.link).pathname.replace(/\/$/, '');
       const result = await fetch(this.baseSearchUrl, {
         method: 'POST',
@@ -93,38 +102,55 @@ export class VrtMaxRetriever extends Retriever {
       );
       if (!aflItem) return entry;
       const seasonItems = aflItem.components[0].items;
-      for (const seasonItem of seasonItems) {
-        // Set season
-        const title = seasonItem.title;
-        const seasonString = title.match(/Seizoen (\d+)/)?.[1];
-        if (!seasonString) continue;
-        const seasonInt = parseInt(seasonString);
-        entry.seasons.set(seasonInt, new Set());
+      const paginated = aflItem.components[0].paginatedItems;
+      if (seasonItems) {
+        // This occurs when multiple seasons are available
+        for (const seasonItem of seasonItems) {
+          // Set season as key in map
+          const title = seasonItem.title;
+          const seasonString = title.match(/Seizoen (\d+)/)?.[1];
+          if (!seasonString) continue;
+          const seasonInt = parseInt(seasonString);
+          entry.seasons.set(seasonInt, new Set());
 
-        const paginated = seasonItem.components[0].paginatedItems;
-        const listId = seasonItem.components[0].listId;
-        if (paginated) {
-          // This contains all episodes already
-          for (const edge of paginated.edges) {
-            const parsedMeta = this.parsePrimaryMeta(edge.node.primaryMeta);
-            if (!parsedMeta) continue;
-            entry.seasons
-              .get(parseInt(parsedMeta.season))
-              ?.add(parseInt(parsedMeta.episode));
+          const paginated = seasonItem.components[0].paginatedItems;
+          const listId = seasonItem.components[0].listId;
+          if (paginated) {
+            // This contains all episodes already
+            for (const edge of paginated.edges) {
+              const parsedMeta = this.parsePrimaryMeta(edge.node.primaryMeta);
+              if (!parsedMeta) continue;
+              entry.seasons
+                .get(parseInt(parsedMeta.season))
+                ?.add(parseInt(parsedMeta.episode));
+            }
+          } else if (listId) {
+            // These seasons require further requests to get the episodes
+            const episodeNumbers = await this.retrieveExtraEpisodes(listId);
+            for (const episodeNumber of episodeNumbers) {
+              entry.seasons.get(seasonInt)?.add(episodeNumber);
+            }
           }
-        } else if (listId) {
-          // These seasons require further requests to get the episodes
-          const episodeNumbers = await this.retrieveExtraEpisodes(listId);
-          for (const episodeNumber of episodeNumbers) {
-            entry.seasons.get(seasonInt)?.add(episodeNumber);
-          }
+        }
+      } else if (paginated) {
+        // This occurs when only one season is available
+        for (const edge of paginated.edges) {
+          const parsedMeta = this.parsePrimaryMeta(edge.node.primaryMeta);
+          if (!parsedMeta) continue;
+          // set season as key in map if doesnt exist yet
+          const has = entry.seasons.has(parseInt(parsedMeta.season));
+          if (!has) entry.seasons.set(parseInt(parsedMeta.season), new Set());
+          entry.seasons
+            .get(parseInt(parsedMeta.season))
+            ?.add(parseInt(parsedMeta.episode));
         }
       }
 
       return entry;
-    });
-
-    return Promise.all(entriesWithEpisodes);
+    } catch (e) {
+      console.log(`Error occured while retrieving episode data:`, e);
+      return entry;
+    }
   }
 
   private async retrieveExtraEpisodes(listId: string): Promise<number[]> {
@@ -149,6 +175,7 @@ export class VrtMaxRetriever extends Retriever {
     const json = (await response.json()) as unknown as VrtMaxListFetchResponse;
     const items = json.data.list.items;
     for (const item of items) {
+      if (!item.primaryMeta) continue;
       const parsedMeta = this.parsePrimaryMeta(item.primaryMeta);
       if (!parsedMeta) continue;
       result.push(parseInt(parsedMeta.episode));
@@ -208,6 +235,16 @@ interface VrtMaxDetailsFetchResponse {
         items: {
           title: string;
           components: {
+            paginatedItems: {
+              edges: {
+                node: {
+                  title: string;
+                  primaryMeta: {
+                    value: string;
+                  }[];
+                };
+              }[];
+            };
             items: {
               title: string;
               components: {

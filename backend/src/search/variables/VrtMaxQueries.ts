@@ -44,6 +44,10 @@ query VideoProgramPage($pageId: ID!, $lazyItemCount: Int = 10, $after: ID, $befo
           items {
             title
             components {
+              ... on PaginatedTileList {
+                ...paginatedTileListFragment
+                __typename
+              }
               ... on IComponent {
                 ... on ContainerNavigation {
                   items {
