@@ -19,5 +19,5 @@ Data returned by the server might not be correct, this is solely because the str
 ## Backend
 
 The backend is written in TypeScript using the [NestJS](https://nestjs.com/) framework. It also uses caching to reduce the amount of requests to the streaming services. This caching is currently done in-memory and rather naive.
-The structure allows for easyly changing the caching mechanism to something more robust and/or persistent.
+The structure allows for easily changing the caching mechanism to something more robust and/or persistent.
 Adding new streaming services is also very easy, just create a new service that implements the `Retriever` interface and add it to the `SearchModule` and the `RetrieverManager`.
