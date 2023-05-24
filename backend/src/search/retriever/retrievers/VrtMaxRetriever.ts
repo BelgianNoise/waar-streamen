@@ -54,7 +54,7 @@ export class VrtMaxRetriever extends Retriever {
         platform: this.platform,
         title: edge.node.title,
         description: edge.node.description,
-        imageUrl: edge.node.image.templateUri,
+        imageUrl: edge.node.image.templateUrl,
         link: edge.node.link, // link is not yet the correct value (/vrtnu/a-z/<name>/)
         language: '-',
         seasons: new Map(),
@@ -81,7 +81,7 @@ interface VrtMaxFetchResponse {
                 link: string;
                 title: string;
                 image: {
-                  templateUri: string;
+                  templateUrl: string;
                 };
               };
             }[];
