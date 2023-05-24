@@ -13,7 +13,8 @@ Data returned by the server might not be correct, this is solely because the str
 - [x] Streamz
   - Retrieveing a full list of avaiable episodes is too resource intensive, only the available seasons are returned, where possible.
   - Language is not always reported
-- [ ] VRT MAX
+- [x] VRT MAX
+  - Language is never reported
 - [ ] NPO Start
 
 ## Backend
