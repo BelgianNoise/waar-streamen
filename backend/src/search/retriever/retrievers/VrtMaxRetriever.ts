@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
-import { EntriesInMemoryExpiringCache } from '../../cache/EntriesInMemoryExpiringCache';
 import {
   vrtMaxDetailsQuery,
   vrtMaxListQuery,
   vrtMaxSearchQuery,
 } from '../../variables/VrtMaxQueries';
+import { EntriesLruCache } from '../../cache/EntriesLruCache';
 
 /**
  * Retrieves entries from VRT MAX.
  */
 @Injectable()
 export class VrtMaxRetriever extends Retriever {
-  constructor(protected readonly cacheService: EntriesInMemoryExpiringCache) {
+  constructor(protected readonly cacheService: EntriesLruCache) {
     super(
       'https://www.vrt.be/vrtnu-api/graphql/public/v1',
       'VRT MAX',

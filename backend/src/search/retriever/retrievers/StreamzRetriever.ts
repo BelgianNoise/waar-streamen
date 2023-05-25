@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
-import { EntriesInMemoryExpiringCache } from '../../cache/EntriesInMemoryExpiringCache';
 import { vtmGoParser } from '../../../util/functions/VtmGoParser';
+import { EntriesLruCache } from '../../cache/EntriesLruCache';
 
 /**
  * Retrieves entries from Streamz.
@@ -11,7 +11,7 @@ import { vtmGoParser } from '../../../util/functions/VtmGoParser';
 export class StreamzRetriever extends Retriever {
   private cookie: string;
 
-  constructor(protected readonly cacheService: EntriesInMemoryExpiringCache) {
+  constructor(protected readonly cacheService: EntriesLruCache) {
     super('https://www.streamz.be/streamz/zoeken', 'Streamz', cacheService);
 
     this.cookie =

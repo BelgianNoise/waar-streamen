@@ -1,6 +1,6 @@
+import { LRUCache } from 'lru-cache';
 import { Entry } from '../../models/Entry';
 import { Platform } from '../../models/Platform';
-import { Cache } from '../../util/cache/Cache';
 
 /**
  * Abstract class for retrieving entries from a given platform.
@@ -11,7 +11,7 @@ export abstract class Retriever {
   constructor(
     protected readonly baseSearchUrl: string,
     protected readonly platform: Platform,
-    protected readonly cacheService: Cache<string, Entry[]>,
+    protected readonly cacheService: LRUCache<string, Entry[]>,
   ) {
     this.enableCache = process.env.ENABLE_CACHE === 'true';
   }
