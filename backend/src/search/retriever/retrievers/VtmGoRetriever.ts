@@ -3,6 +3,7 @@ import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { vtmGoParser } from '../../../util/functions/VtmGoParser';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
+import { SearchOptions } from '../../../models/SearchOptions';
 
 /**
  * Retrieves entries from VTM Go.
@@ -17,7 +18,10 @@ export class VtmGoRetriever extends Retriever {
     this.cookie = `authId=${process.env.AUTH_VTMGO_AUTH_ID}`;
   }
 
-  async retrieve(searchTerm: string): Promise<Entry[]> {
+  async retrieve(
+    searchTerm: string,
+    searchOptions: SearchOptions,
+  ): Promise<Entry[]> {
     const reqUrl = new URL(this.baseSearchUrl);
     reqUrl.searchParams.append('query', searchTerm);
     const result = await fetch(reqUrl, {
@@ -38,6 +42,6 @@ export class VtmGoRetriever extends Retriever {
       throw new Error('Cookie consent required');
     }
 
-    return vtmGoParser(text, this.platform, this.cookie);
+    return vtmGoParser(text, this.platform, this.cookie, searchOptions);
   }
 }

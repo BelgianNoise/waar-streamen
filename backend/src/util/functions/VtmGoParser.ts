@@ -2,6 +2,7 @@ import { parseLanguage } from '../../models/Language';
 import { Entry } from '../../models/Entry';
 import parse from 'node-html-parser';
 import { Platform } from '../../models/Platform';
+import { SearchOptions } from '../../models/SearchOptions';
 
 // This code was originally part of VtmGoRetriever.ts, but StreamzRetriever.ts
 // uses exactly the same code. So I moved it to a separate file.
@@ -9,6 +10,7 @@ export const vtmGoParser = async (
   text: string,
   platform: Platform,
   authCookie: string,
+  searchOptions: SearchOptions
 ): Promise<Entry[]> => {
   const parsed = parse(text);
   const items = parsed.querySelectorAll(
@@ -31,7 +33,7 @@ export const vtmGoParser = async (
       seasons: new Map(),
     };
 
-    if (link) {
+    if (link && searchOptions.fetchDepth !== 'shallow') {
       const detailed = await fetch(link, {
         headers: { cookie: authCookie },
       });
@@ -56,12 +58,11 @@ export const vtmGoParser = async (
       const detailDesc = parsedDetail.querySelector('.detail__description');
       if (detailDesc) entry.description = detailDesc.innerText;
       // try get seasons and episodes from the page
-      // Retrieveing episodes is way too resource intensive because VTM GO
-      // renders mostle server side.
       const seasons = parsedDetail.querySelectorAll(
         '#season-picker-wrapper .custom-select__option',
       );
       if (seasons.length > 0) {
+        // There are multiple seasons and there is a dropdown to select them.
         seasons.forEach((season) => {
           const innerText = season.innerText;
           const seasonMatch = innerText.match(/Seizoen ([0-9]+)/i);
@@ -70,7 +71,14 @@ export const vtmGoParser = async (
             entry.seasons.set(seasonInt, new Set());
           }
         });
+        // episode of current season might also be on this page. TODO TODO
+        if (searchOptions.fetchDepth === 'full') {
+          // Try fetch episodes for every season TODO TODO
+          // Might need to split up VTM GO and Streamz
+        }
       } else {
+        // There is only one season and the episodes are listed on the page.
+        // episodes numbers might also be on this page. TODO TODO
         const matches = parsed.innerHTML.match(/seizoen\w?[0-9]+/gim);
         if (matches) {
           matches.forEach((match) => {

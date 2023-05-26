@@ -4,6 +4,7 @@ import { Retriever } from '../Retriever';
 import { parseLanguage } from '../../../models/Language';
 import parse from 'node-html-parser';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
+import { SearchOptions } from '../../../models/SearchOptions';
 
 /**
  * Retrieves entries from GoPlay.
@@ -14,7 +15,10 @@ export class GoPlayRetriever extends Retriever {
     super('https://api.goplay.be/search', 'GoPlay', cacheService);
   }
 
-  async retrieve(searchTerm: string): Promise<Entry[]> {
+  async retrieve(
+    searchTerm: string,
+    searchOptions: SearchOptions,
+  ): Promise<Entry[]> {
     const result = await fetch(this.baseSearchUrl, {
       method: 'POST',
       headers: {
@@ -47,28 +51,31 @@ export class GoPlayRetriever extends Retriever {
         seasons: new Map(),
       };
 
-      const detailsResponse = await fetch(entry.link);
-      const text = await detailsResponse.text();
-      const parsedDOM = parse(text);
-      const dataHero = parsedDOM.querySelector('main div:nth-child(2)');
-      const seasonMatches = dataHero?.rawAttrs.match(
-        /s[0-9]+-aflevering-[0-9]+/gim,
-      );
-      if (seasonMatches) {
-        seasonMatches.sort().forEach((match) => {
-          const season = match.match(/^s([0-9]+)/i);
-          const episode = match.match(/([0-9]+)$/i);
-          if (season && episode) {
-            const seasonInt = parseInt(season[1]);
-            const episodeInt = parseInt(episode[1]);
-            const hasSeason = entry.seasons.has(seasonInt);
-            if (hasSeason) {
-              entry.seasons.get(seasonInt)?.add(episodeInt);
-            } else {
-              entry.seasons.set(seasonInt, new Set([episodeInt]));
+      // Only fetch extra information if the user wants it.
+      if (searchOptions.fetchDepth !== 'shallow') {
+        const detailsResponse = await fetch(entry.link);
+        const text = await detailsResponse.text();
+        const parsedDOM = parse(text);
+        const dataHero = parsedDOM.querySelector('main div:nth-child(2)');
+        const seasonMatches = dataHero?.rawAttrs.match(
+          /s[0-9]+-aflevering-[0-9]+/gim,
+        );
+        if (seasonMatches) {
+          seasonMatches.sort().forEach((match) => {
+            const season = match.match(/^s([0-9]+)/i);
+            const episode = match.match(/([0-9]+)$/i);
+            if (season && episode) {
+              const seasonInt = parseInt(season[1]);
+              const episodeInt = parseInt(episode[1]);
+              const hasSeason = entry.seasons.has(seasonInt);
+              if (hasSeason) {
+                entry.seasons.get(seasonInt)?.add(episodeInt);
+              } else {
+                entry.seasons.set(seasonInt, new Set([episodeInt]));
+              }
             }
-          }
-        });
+          });
+        }
       }
 
       return entry;

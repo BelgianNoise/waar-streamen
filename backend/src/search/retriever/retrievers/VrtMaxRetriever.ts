@@ -7,6 +7,7 @@ import {
   vrtMaxSearchQuery,
 } from '../../variables/VrtMaxQueries';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
+import { SearchOptions } from '../../../models/SearchOptions';
 
 /**
  * Retrieves entries from VRT MAX.
@@ -21,7 +22,10 @@ export class VrtMaxRetriever extends Retriever {
     );
   }
 
-  async retrieve(searchTerm: string): Promise<Entry[]> {
+  async retrieve(
+    searchTerm: string,
+    searchOptions: SearchOptions
+  ): Promise<Entry[]> {
     const result = await fetch(this.baseSearchUrl, {
       method: 'POST',
       headers: {
@@ -68,14 +72,20 @@ export class VrtMaxRetriever extends Retriever {
       return entry;
     });
 
-    const entriesWithEpisodes = entries.map((entry) =>
-      this.retrieveEpisodes(entry),
-    );
-
-    return Promise.all(entriesWithEpisodes);
+    if (searchOptions.fetchDepth !== 'shallow') {
+      const entriesWithEpisodes = entries.map((entry) =>
+        this.retrieveEpisodes(entry, searchOptions),
+      );
+      return Promise.all(entriesWithEpisodes);
+    } else {
+      return entries;
+    }
   }
 
-  private async retrieveEpisodes(entry: Entry): Promise<Entry> {
+  private async retrieveEpisodes(
+    entry: Entry,
+    searchOptions: SearchOptions,
+  ): Promise<Entry> {
     try {
       const id = new URL(entry.link).pathname.replace(/\/$/, '');
       const result = await fetch(this.baseSearchUrl, {
@@ -127,9 +137,11 @@ export class VrtMaxRetriever extends Retriever {
             }
           } else if (listId) {
             // These seasons require further requests to get the episodes
-            const episodeNumbers = await this.retrieveExtraEpisodes(listId);
-            for (const episodeNumber of episodeNumbers) {
-              entry.seasons.get(seasonInt)?.add(episodeNumber);
+            if (searchOptions.fetchDepth === 'full') {
+              const episodeNumbers = await this.retrieveExtraEpisodes(listId);
+              for (const episodeNumber of episodeNumbers) {
+                entry.seasons.get(seasonInt)?.add(episodeNumber);
+              }
             }
           }
         }

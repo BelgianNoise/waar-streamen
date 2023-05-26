@@ -5,6 +5,7 @@ import { GoPlayRetriever } from './retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retrievers/VtmGoRetriever';
 import { StreamzRetriever } from './retrievers/StreamzRetriever';
 import { VrtMaxRetriever } from './retrievers/VrtMaxRetriever';
+import { SearchOptions } from '../../models/SearchOptions';
 
 /**
  * Class that is responsible for retrieving entries from all platforms.
@@ -27,10 +28,14 @@ export class RetrieverManager {
     ];
   }
 
-  async retrieveAll(searchTerm: string): Promise<Entry[]> {
-    const retrieveAll = this.retrievers.map((r) => r.search(searchTerm));
+  async retrieveAll(
+    searchTerm: string,
+    searchOptions: SearchOptions,
+  ): Promise<Entry[]> {
+    const retrieveAll = this.retrievers.map((r) =>
+      r.search(searchTerm, searchOptions),
+    );
     const allAwaited = await Promise.all(retrieveAll);
     return allAwaited.reduce((acc, val) => acc.concat(val), []);
   }
-
 }
