@@ -22,7 +22,7 @@ The structure allows for easily changing the caching mechanism to something more
 Adding new streaming services is also very easy, just create a new service that implements the `Retriever` interface and add it to the `SearchModule` and the `RetrieverManager`.
 
 You can choose how deep you want the backend to search for data about a program. A variable `fetchDepth` is used to determine this. This variable can have 3 values (`shallow`, `deep` or `full`) which will all yield different data for every streaming platform.
-f.e.: `shallow` might only return the title and an image that is not poster size for VTM GO, while `deep` will add a description, language and a poster sized image and maybe some data about available seasons and episodes. `full` should even go deeper and retrieve all available episedes.
+f.e.: `shallow` might only return the title and an image that is not poster size for VTM GO, while `deep` will add a description, language and a poster sized image and maybe some data about available seasons and episodes. `full` should even go deeper and retrieve all available episedes. GoPlay will however contain all data by just using `deep` causse its backend returns more wanted data
 
 The default values for this variable is `shallow` to reduce the load on the server.
 Depending on your query this parameter can make a big difference.
