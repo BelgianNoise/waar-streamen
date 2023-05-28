@@ -7,9 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  permissions:
-    contents: 'read'
-    id-token: 'write'
 
   build-and-push:
     name: Build and push to GCP Container Registry
@@ -19,6 +16,11 @@ jobs:
       $PROJECT_ID: waar-streamen
       $SA_NAME: github-actions
     
+    # From docs
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
 
     - name: Authenticate GCP
