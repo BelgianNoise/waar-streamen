@@ -124,20 +124,21 @@ export class VrtMaxRetriever extends Retriever {
           const seasonInt = parseInt(seasonString);
           entry.seasons.set(seasonInt, new Set());
 
-          const paginated = seasonItem.components[0].paginatedItems;
-          const listId = seasonItem.components[0].listId;
-          if (paginated) {
-            // This contains all episodes already
-            for (const edge of paginated.edges) {
-              const parsedMeta = this.parsePrimaryMeta(edge.node.primaryMeta);
-              if (!parsedMeta) continue;
-              entry.seasons
-                .get(parseInt(parsedMeta.season))
-                ?.add(parseInt(parsedMeta.episode));
-            }
-          } else if (listId) {
-            // These seasons require further requests to get the episodes
-            if (searchOptions.fetchDepth === 'full') {
+          // Add all episode numbers
+          if (searchOptions.fetchDepth === 'full') {
+            const paginated = seasonItem.components[0].paginatedItems;
+            const listId = seasonItem.components[0].listId;
+            if (paginated) {
+              // This contains all episodes already
+              for (const edge of paginated.edges) {
+                const parsedMeta = this.parsePrimaryMeta(edge.node.primaryMeta);
+                if (!parsedMeta) continue;
+                entry.seasons
+                  .get(parseInt(parsedMeta.season))
+                  ?.add(parseInt(parsedMeta.episode));
+              }
+            } else if (listId) {
+              // These seasons require further requests to get the episodes
               const episodeNumbers = await this.retrieveExtraEpisodes(listId);
               for (const episodeNumber of episodeNumbers) {
                 entry.seasons.get(seasonInt)?.add(episodeNumber);
