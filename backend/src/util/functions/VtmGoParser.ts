@@ -3,6 +3,7 @@ import { Entry } from '../../models/Entry';
 import parse from 'node-html-parser';
 import { Platform } from '../../models/Platform';
 import { SearchOptions } from '../../models/SearchOptions';
+import * as nodeHtmlParser from 'node-html-parser';
 
 // This code was originally part of VtmGoRetriever.ts, but StreamzRetriever.ts
 // uses exactly the same code. So I moved it to a separate file.
@@ -64,8 +65,7 @@ export const vtmGoParser = async (
       if (seasons.length > 0) {
         // There are multiple seasons and there is a dropdown to select them.
         seasons.forEach((season) => {
-          const innerText = season.innerText;
-          const seasonMatch = innerText.match(/Seizoen ([0-9]+)/i);
+          const seasonMatch = season.innerText.match(/Seizoen ([0-9]+)/i);
           if (seasonMatch) {
             const seasonInt = parseInt(seasonMatch[1]);
             entry.seasons.set(seasonInt, new Set());
@@ -78,17 +78,8 @@ export const vtmGoParser = async (
         }
       } else {
         // There is only one season and the episodes are listed on the page.
-        // episodes numbers might also be on this page. TODO TODO
-        const matches = parsed.innerHTML.match(/seizoen\w?[0-9]+/gim);
-        if (matches) {
-          matches.forEach((match) => {
-            const seasonMatch = match.match(/seizoen\w?([0-9]+)/i);
-            if (seasonMatch) {
-              const seasonInt = parseInt(seasonMatch[1]);
-              entry.seasons.set(seasonInt, new Set());
-            }
-          });
-        }
+        // The season number is not always explicitly available
+        parseSingleSeasonPage(parsedDetail, entry);
       }
     }
 
@@ -96,4 +87,31 @@ export const vtmGoParser = async (
   });
 
   return Promise.all(entries);
+};
+
+const parseSingleSeasonPage = (
+  parsedPage: nodeHtmlParser.HTMLElement,
+  entry: Entry,
+): void => {
+  const matches = parsedPage.innerHTML.match(/seizoen\w?([0-9]+)/gim);
+  let seasonNumber: number;
+  if (matches) {
+    // season was listed on the page
+    seasonNumber = parseInt(matches[1]);
+    entry.seasons.set(seasonNumber, new Set());
+  } else {
+    // default to season 1
+    seasonNumber = 1;
+    entry.seasons.set(seasonNumber, new Set());
+  }
+  // Parse all episodes
+  const episodes = parsedPage.querySelectorAll(
+    '.detail__season .media__body .media__link span',
+  );
+  episodes.forEach((episode) => {
+    const episodeName = episode.innerText.match(/[0-9]+/);
+    if (episodeName) {
+      entry.seasons.get(seasonNumber)?.add(parseInt(episodeName[0]));
+    }
+  });
 };
