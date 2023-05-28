@@ -33,7 +33,6 @@ export class RetrieverManager {
     searchTerm: string,
     searchOptions: SearchOptions,
   ): Promise<Entry[]> {
-    this.logger.debug(`${'='.repeat(15)} START ${'='.repeat(15)}`);
     this.logger.debug(
       `Searching for "${searchTerm}" with options:`,
       searchOptions,
@@ -44,7 +43,6 @@ export class RetrieverManager {
       return res;
     });
     const allAwaited = await Promise.all(retrieveAll);
-    this.logger.debug(`${'='.repeat(15)}  END  ${'='.repeat(15)}`);
     return allAwaited.reduce((acc, val) => acc.concat(val), []);
   }
 }
