@@ -25,7 +25,8 @@ jobs:
 
     steps:
 
-    - run: echo "${{ secrets.GCP_SA_KEY }}"
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - name: Authenticate GCP
       uses: google-github-actions/auth@v1
@@ -37,9 +38,6 @@ jobs:
       uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: ${{ env.PROJECT_ID }}
-
-    - name: Checkout
-      uses: actions/checkout@v2
 
     - name: Build the Docker image
       run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend/
