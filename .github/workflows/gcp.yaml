@@ -21,12 +21,14 @@ jobs:
     
     steps:
 
-    - uses: google-github-actions/auth@v1
+    - name: Authenticate GCP
+      uses: google-github-actions/auth@v1
       with:
-        service_account: '${{ env.SA_NAME }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
-        credentials_json: ${{ secrets.GCP_SA_KEY }
+        service_account: ${{ env.SA_NAME }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    - uses: google-github-actions/setup-gcloud@v1
+    - name: Setup GCP
+      uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: ${{ env.PROJECT_ID }}
 
