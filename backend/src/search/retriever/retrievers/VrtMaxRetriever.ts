@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import {
@@ -14,6 +14,8 @@ import { SearchOptions } from '../../../models/SearchOptions';
  */
 @Injectable()
 export class VrtMaxRetriever extends Retriever {
+  protected readonly logger = new Logger(VrtMaxRetriever.name);
+
   constructor(protected readonly cacheService: EntriesLruCache) {
     super(
       'https://www.vrt.be/vrtnu-api/graphql/public/v1',
@@ -162,7 +164,7 @@ export class VrtMaxRetriever extends Retriever {
 
       return entry;
     } catch (e) {
-      console.log(`Error occured while retrieving episode data:`, e);
+      this.logger.log(`Error occured while retrieving episode data:`, e);
       return entry;
     }
   }

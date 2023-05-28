@@ -2,16 +2,18 @@ import { LRUCache } from 'lru-cache';
 import { Entry } from '../../models/Entry';
 import { Platform } from '../../models/Platform';
 import { SearchOptions } from '../../models/SearchOptions';
+import { Logger } from '@nestjs/common';
 
 /**
  * Abstract class for retrieving entries from a given platform.
  */
 export abstract class Retriever {
+  protected readonly logger = new Logger(Retriever.name);
   private readonly enableCache: boolean;
 
   constructor(
     protected readonly baseSearchUrl: string,
-    protected readonly platform: Platform,
+    public readonly platform: Platform,
     protected readonly cacheService: LRUCache<string, Entry[]>,
   ) {
     this.enableCache = process.env.ENABLE_CACHE === 'true';
@@ -38,7 +40,7 @@ export abstract class Retriever {
         return await this.retrieve(searchTerm, searchOptions);
       }
     } catch (e: unknown) {
-      console.error(`Error while searching "${searchTerm}"`, e);
+      this.logger.error(`Error while searching "${searchTerm}"`, e);
       return [
         {
           platform: this.platform,

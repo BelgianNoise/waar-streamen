@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Entry } from '../../models/Entry';
 import { Retriever } from './Retriever';
 import { GoPlayRetriever } from './retrievers/GoPlayRetriever';
@@ -12,6 +12,7 @@ import { SearchOptions } from '../../models/SearchOptions';
  */
 @Injectable()
 export class RetrieverManager {
+  private readonly logger = new Logger(RetrieverManager.name);
   private readonly retrievers: Retriever[];
 
   constructor(
@@ -32,10 +33,18 @@ export class RetrieverManager {
     searchTerm: string,
     searchOptions: SearchOptions,
   ): Promise<Entry[]> {
-    const retrieveAll = this.retrievers.map((r) =>
-      r.search(searchTerm, searchOptions),
+    this.logger.debug(`${'='.repeat(15)} START ${'='.repeat(15)}`);
+    this.logger.debug(
+      `Searching for "${searchTerm}" with options:`,
+      searchOptions,
     );
+    const retrieveAll = this.retrievers.map(async (r): Promise<Entry[]> => {
+      const res = await r.search(searchTerm, searchOptions);
+      this.logger.debug(`Retrieved ${res.length} entries from ${r.platform}`);
+      return res;
+    });
     const allAwaited = await Promise.all(retrieveAll);
+    this.logger.debug(`${'='.repeat(15)}  END  ${'='.repeat(15)}`);
     return allAwaited.reduce((acc, val) => acc.concat(val), []);
   }
 }

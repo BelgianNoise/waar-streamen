@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { vtmGoParser } from '../../../util/functions/VtmGoParser';
@@ -10,6 +10,7 @@ import { SearchOptions } from '../../../models/SearchOptions';
  */
 @Injectable()
 export class VtmGoRetriever extends Retriever {
+  protected readonly logger = new Logger(VtmGoRetriever.name);
   private cookie: string;
 
   constructor(protected readonly cacheService: EntriesLruCache) {
@@ -42,6 +43,12 @@ export class VtmGoRetriever extends Retriever {
       throw new Error('Cookie consent required');
     }
 
-    return vtmGoParser(text, this.platform, this.cookie, searchOptions);
+    return vtmGoParser(
+      text,
+      this.platform,
+      this.cookie,
+      searchOptions,
+      this.logger,
+    );
   }
 }

@@ -4,6 +4,7 @@ import parse from 'node-html-parser';
 import { Platform } from '../../models/Platform';
 import { SearchOptions } from '../../models/SearchOptions';
 import * as nodeHtmlParser from 'node-html-parser';
+import { Logger } from '@nestjs/common';
 
 // This code was originally part of VtmGoRetriever.ts, but StreamzRetriever.ts
 // uses exactly the same code. So I moved it to a separate file.
@@ -12,6 +13,7 @@ export const vtmGoParser = async (
   platform: Platform,
   authCookie: string,
   searchOptions: SearchOptions,
+  logger: Logger,
 ): Promise<Entry[]> => {
   const parsed = parse(text);
   const items = parsed.querySelectorAll(
@@ -92,7 +94,7 @@ export const vtmGoParser = async (
                 const parsedEpisodes = parse(episodeText);
                 parseEpisodes(parsedEpisodes, entry, seasonNumber);
               } catch (e) {
-                console.log(`Error fetching episodes for ${entry.link}: ${e}`);
+                logger.log(`Error fetching episodes for ${entry.link}`, e);
                 return;
               }
             },

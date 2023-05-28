@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { vtmGoParser } from '../../../util/functions/VtmGoParser';
@@ -10,6 +10,7 @@ import { SearchOptions } from '../../../models/SearchOptions';
  */
 @Injectable()
 export class StreamzRetriever extends Retriever {
+  protected readonly logger = new Logger(StreamzRetriever.name);
   private cookie: string;
 
   constructor(protected readonly cacheService: EntriesLruCache) {
@@ -47,6 +48,12 @@ export class StreamzRetriever extends Retriever {
       throw new Error('Authentication failed');
     }
 
-    return vtmGoParser(text, this.platform, this.cookie, searchOptions);
+    return vtmGoParser(
+      text,
+      this.platform,
+      this.cookie,
+      searchOptions,
+      this.logger,
+    );
   }
 }
