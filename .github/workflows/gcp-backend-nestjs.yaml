@@ -1,0 +1,27 @@
+name: Check if NestJS backend builds
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  build:
+  
+    staps:
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Go to backend directory
+      run: cd backend
+
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build
+      run: npm run build

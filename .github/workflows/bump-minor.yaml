@@ -1,9 +1,6 @@
 name: Push Docker image to GCP Artifact Registry
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -39,6 +36,10 @@ jobs:
       with:
         project_id: ${{ env.PROJECT_ID }}
 
+    - name: Automatic tagging
+      id: git_tag
+      run: bash .github/scripts/git-tag.sh -v minor
+
     - name: Build the Docker image
       run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend/
 
@@ -53,8 +54,7 @@ jobs:
 
     - name: Push docker image to GCP Artifact Registry
       env:
-        # GIT_TAG: ${{ github.sha }}
-        GIT_TAG: v0.1.0
+        GIT_TAG: ${{ steps.git_tag.outputs.git-tag }}}
       run: |
         docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:latest
         docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:${{ env.GIT_TAG }}
