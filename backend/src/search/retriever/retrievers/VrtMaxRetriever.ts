@@ -54,9 +54,9 @@ export class VrtMaxRetriever extends Retriever {
 
     const json = (await result.json()) as unknown as VrtMaxSearchFetchResponse;
     const items = json.data.uiSearch[0].items;
-    if (!items) throw new Error('Response parsing failed');
+    if (!items) return [];
     const item = items.find((item) => item.title.includes('Kijk'));
-    if (!item) throw new Error('Response parsing failed');
+    if (!item) throw new Error('Response parsing failed (item)');
     const edges = item.components[0].paginatedItems.edges;
     const entries = edges.map((edge) => {
       const entry: Entry = {
