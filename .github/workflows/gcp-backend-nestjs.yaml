@@ -11,7 +11,8 @@ on:
 jobs:
 
   build:
-  
+    name: Install and build
+    runs-on: ubuntu-latest
     staps:
     
     - name: Checkout
