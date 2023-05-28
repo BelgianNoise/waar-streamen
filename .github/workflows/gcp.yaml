@@ -25,6 +25,8 @@ jobs:
 
     steps:
 
+    - run: echo "${{ secrets.GCP_SA_KEY }}"
+
     - name: Authenticate GCP
       uses: google-github-actions/auth@v1
       with:
@@ -51,7 +53,7 @@ jobs:
       run: |
         echo "IMAGE_LOCATION=${{ env.REGISTRY_HOSTNAME }}/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}" >> $GITHUB_ENV
 
-    - name: Push docker container to GCP Artifact Registry
+    - name: Push docker image to GCP Artifact Registry
       env:
         # GIT_TAG: ${{ github.sha }}
         GIT_TAG: v0.1.0
