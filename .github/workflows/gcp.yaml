@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build the Docker image
-      run: docker build -t $IMAGE_NAME:latest ./backend/Dockerfile
+      run: docker build -t ${{ env.IMAGE_NAME }} ./backend/Dockerfile
 
     - name: Configure Docker
       run: gcloud auth configure-docker --quiet
@@ -48,7 +48,7 @@ jobs:
         # GIT_TAG: ${{ github.sha }}
         GIT_TAG: v0.1.0
       run: |
-        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-        docker tag $IMAGE_NAME:latest gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
-        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-        docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+        docker tag ${{ env.IMAGE_NAME }} gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+        docker tag ${{ env.IMAGE_NAME }} gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:$GIT_TAG
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:$GIT_TAG
