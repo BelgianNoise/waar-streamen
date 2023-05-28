@@ -1,4 +1,4 @@
-name: Push Docker image to GCP Container Registry
+name: Push Docker image to GCP Artifact Registry
 
 on:
   push:
@@ -9,12 +9,14 @@ on:
 jobs:
 
   build-and-push:
-    name: Build and push to GCP Container Registry
+    name: Build and push to GCP Artifact Registry
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: waar-streamen
+      IMAGE_NAME: waar-streamen-image
       PROJECT_ID: waar-streamen
       SA_NAME: github-actions
+      REGISTRY_HOSTNAME: europe-west1-docker.pkg.dev
+      REGISTRY_NAME: docker-images
     
     # From docs
     permissions:
@@ -41,14 +43,20 @@ jobs:
       run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend/
 
     - name: Configure Docker
-      run: gcloud auth configure-docker --quiet
+      run: |
+        gcloud auth configure-docker --quiet
+        gcloud auth configure-docker ${{ env.REGISTRY_HOSTNAME }}
 
-    - name: Push docker container to GCP Container Registry
+    - name: Generate reuseable variable for image
+      run: |
+        echo "IMAGE_LOCATION=${{ env.REGISTRY_HOSTNAME }}/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}" >> $GITHUB_ENV
+
+    - name: Push docker container to GCP Artifact Registry
       env:
         # GIT_TAG: ${{ github.sha }}
         GIT_TAG: v0.1.0
       run: |
-        docker tag ${{ env.IMAGE_NAME }}:latest gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
-        docker tag ${{ env.IMAGE_NAME }}:latest gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.GIT_TAG }}
-        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
-        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.GIT_TAG }}
+        docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:latest
+        docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:${{ env.GIT_TAG }}
+        docker push ${{ env.IMAGE_LOCATION }}:latest
+        docker push ${{ env.IMAGE_LOCATION }}:${{ env.GIT_TAG }}
