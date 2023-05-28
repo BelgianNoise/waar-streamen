@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build the Docker image
-      run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend/Dockerfile
+      run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend/
 
     - name: Configure Docker
       run: gcloud auth configure-docker --quiet
