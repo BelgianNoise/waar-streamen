@@ -11,7 +11,7 @@ export const vtmGoParser = async (
   text: string,
   platform: Platform,
   authCookie: string,
-  searchOptions: SearchOptions
+  searchOptions: SearchOptions,
 ): Promise<Entry[]> => {
   const parsed = parse(text);
   const items = parsed.querySelectorAll(
@@ -64,17 +64,42 @@ export const vtmGoParser = async (
       );
       if (seasons.length > 0) {
         // There are multiple seasons and there is a dropdown to select them.
-        seasons.forEach((season) => {
-          const seasonMatch = season.innerText.match(/Seizoen ([0-9]+)/i);
+        // Set all season numbers
+        const seasonNumbers = seasons.reduce((acc, curr) => {
+          const seasonMatch = curr.innerText.match(/Seizoen ([0-9]+)/i);
           if (seasonMatch) {
             const seasonInt = parseInt(seasonMatch[1]);
-            entry.seasons.set(seasonInt, new Set());
+            return [...acc, seasonInt];
+          } else {
+            return acc;
           }
-        });
-        // episode of current season might also be on this page. TODO TODO
+        }, []);
+        for (const seasonNumber of seasonNumbers) {
+          entry.seasons.set(seasonNumber, new Set());
+        }
         if (searchOptions.fetchDepth === 'full') {
-          // Try fetch episodes for every season TODO TODO
-          // Might need to split up VTM GO and Streamz
+          // Try fetch episodes for every season
+          const episodePromises = seasonNumbers.map(
+            async (seasonNumber): Promise<void> => {
+              try {
+                const episodeFetch = await fetch(
+                  `${entry.link}/seizoen-${seasonNumber}`,
+                  {
+                    headers: { cookie: authCookie },
+                  },
+                );
+                const episodeText = await episodeFetch.text();
+                const parsedEpisodes = parse(episodeText);
+                parseEpisodes(parsedEpisodes, entry, seasonNumber);
+              } catch (e) {
+                console.log(`Error fetching episodes for ${entry.link}: ${e}`);
+                return;
+              }
+            },
+          );
+
+          // run all promises in parallel
+          await Promise.all(episodePromises);
         }
       } else {
         // There is only one season and the episodes are listed on the page.
@@ -105,6 +130,14 @@ const parseSingleSeasonPage = (
     entry.seasons.set(seasonNumber, new Set());
   }
   // Parse all episodes
+  parseEpisodes(parsedPage, entry, seasonNumber);
+};
+
+const parseEpisodes = (
+  parsedPage: nodeHtmlParser.HTMLElement,
+  entry: Entry,
+  seasonNumber: number,
+): void => {
   const episodes = parsedPage.querySelectorAll(
     '.detail__season .media__body .media__link span',
   );
