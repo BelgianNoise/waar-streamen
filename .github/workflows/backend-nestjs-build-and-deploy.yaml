@@ -17,6 +17,7 @@ jobs:
       IMAGE_NAME: waar-streamen-image
       PROJECT_ID: waar-streamen
       SA_NAME: github-actions
+      REGON: europe-west1
       REGISTRY_HOSTNAME: europe-west1-docker.pkg.dev
       REGISTRY_NAME: docker-images
     
@@ -64,6 +65,7 @@ jobs:
       with:
         service: waar-streamen-backend-nestjs
         image: ${{ env.IMAGE_LOCATION }}:latest
+        region: ${{ env.REGION }}
 
     - name: Test the deployed service
       run: curl "${{ steps.deploy.outputs.url }}"
