@@ -1,4 +1,4 @@
-name: '[Backend NestJs] Build docker image and push to GCP Artifact Registry'
+name: '[Backend NestJs] Build docker image, push to GCP Artifact Registry and deploy on GCP Cloud Run'
 
 on:
   push:
@@ -57,3 +57,9 @@ jobs:
       run: |
         docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:latest
         docker push ${{ env.IMAGE_LOCATION }}:latest
+
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v1
+      with:
+        service: waar-streamen-backend-nestjs
+        image: ${{ env.IMAGE_LOCATION }}:latest
