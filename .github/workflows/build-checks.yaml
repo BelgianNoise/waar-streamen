@@ -2,11 +2,13 @@ name: Check if NestJS backend builds
 
 on:
   push:
-    path:
+    paths:
       - backend-nestjs/**
     branches:
       - main
   pull_request:
+    paths:
+      - backend-nestjs/**
     branches:
       - main
 
