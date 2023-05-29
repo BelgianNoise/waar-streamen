@@ -59,7 +59,11 @@ jobs:
         docker push ${{ env.IMAGE_LOCATION }}:latest
 
     - name: Deploy to Cloud Run
+      id: deploy
       uses: google-github-actions/deploy-cloudrun@v1
       with:
         service: waar-streamen-backend-nestjs
         image: ${{ env.IMAGE_LOCATION }}:latest
+
+    - name: Test the deployed service
+      run: curl "${{ steps.deploy.outputs.url }}"
