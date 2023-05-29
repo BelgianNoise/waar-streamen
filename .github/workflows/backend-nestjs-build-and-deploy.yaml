@@ -18,7 +18,7 @@ jobs:
       PROJECT_ID: waar-streamen
       SA_NAME: github-actions
       CLOUD_RUN_SERVICE: waar-streamen-backend-nestjs
-      REGON: europe-west1
+      REGION: europe-west1
       REGISTRY_HOSTNAME: europe-west1-docker.pkg.dev
       REGISTRY_NAME: docker-images
     
