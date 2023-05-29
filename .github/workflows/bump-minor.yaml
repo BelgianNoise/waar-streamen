@@ -1,4 +1,4 @@
-name: Push Docker image to GCP Artifact Registry
+name: Bump minor version
 
 on:
   workflow_dispatch:
