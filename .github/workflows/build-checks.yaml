@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: ./backend
+
 jobs:
 
   build:
@@ -18,9 +22,6 @@ jobs:
     
     - name: Checkout
       uses: actions/checkout@v2
-    
-    - name: Go to backend directory
-      run: cd backend
 
     - name: Install dependencies
       run: npm install
