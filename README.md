@@ -17,8 +17,7 @@ Data returned by the server might not be correct, this is solely because the str
 
 ## Backend-NestJs (https://nestjs.waar-streamen.nasaj.be/api#/)
 
-The backend is written in TypeScript using the [NestJS](https://nestjs.com/) framework. It also uses caching to reduce the amount of requests to the streaming services. This caching is currently done in-memory and rather naive.
-The structure allows for easily changing the caching mechanism to something more robust and/or persistent.
+The backend is written in TypeScript using the [NestJS](https://nestjs.com/) framework. It uses a lru in memory cache to reduce load nad not make unnecessary requests.
 Adding new streaming services is also very easy, just create a new service that implements the `Retriever` interface and add it to the `SearchModule` and the `RetrieverManager`.
 
 You can choose how deep you want the backend to search for data about a program. A variable `fetchDepth` is used to determine this. This variable can have 3 values (`shallow`, `deep` or `full`) which will all yield different data for every streaming platform.
