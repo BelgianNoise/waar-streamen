@@ -17,6 +17,7 @@ jobs:
       IMAGE_NAME: waar-streamen-image
       PROJECT_ID: waar-streamen
       SA_NAME: github-actions
+      CLOUD_RUN_SERVICE: waar-streamen-backend-nestjs
       REGON: europe-west1
       REGISTRY_HOSTNAME: europe-west1-docker.pkg.dev
       REGISTRY_NAME: docker-images
@@ -63,9 +64,10 @@ jobs:
       id: deploy
       uses: google-github-actions/deploy-cloudrun@v1
       with:
-        service: waar-streamen-backend-nestjs
+        service: ${{ env.CLOUD_RUN_SERVICE }}
         image: ${{ env.IMAGE_LOCATION }}:latest
         region: ${{ env.REGION }}
+        project_id: ${{ env.PROJECT_ID }}
 
     - name: Test the deployed service
       run: curl "${{ steps.deploy.outputs.url }}"
