@@ -1,6 +1,11 @@
-name: Bump minor version
+name: '[Backend NestJs] Build docker image and push to GCP Artifact Registry'
 
 on:
+  push:
+    paths:
+      - backend-nestjs/**
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -22,6 +27,7 @@ jobs:
 
     steps:
 
+    # Important to do this before GCP Auth
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -36,16 +42,11 @@ jobs:
       with:
         project_id: ${{ env.PROJECT_ID }}
 
-    - name: Automatic tagging
-      id: git_tag
-      run: bash .github/scripts/git-tag.sh -v minor
-
     - name: Build the Docker image
       run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend-nestjs/
 
     - name: Configure Docker
       run: |
-        gcloud auth configure-docker --quiet
         gcloud auth configure-docker ${{ env.REGISTRY_HOSTNAME }}
 
     - name: Generate reuseable variable for image
@@ -53,10 +54,6 @@ jobs:
         echo "IMAGE_LOCATION=${{ env.REGISTRY_HOSTNAME }}/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}" >> $GITHUB_ENV
 
     - name: Push docker image to GCP Artifact Registry
-      env:
-        GIT_TAG: ${{ steps.git_tag.outputs.git-tag }}}
       run: |
         docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:latest
-        docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_LOCATION }}:${{ env.GIT_TAG }}
         docker push ${{ env.IMAGE_LOCATION }}:latest
-        docker push ${{ env.IMAGE_LOCATION }}:${{ env.GIT_TAG }}
