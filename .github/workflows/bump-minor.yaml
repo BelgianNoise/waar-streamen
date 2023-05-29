@@ -41,7 +41,7 @@ jobs:
       run: bash .github/scripts/git-tag.sh -v minor
 
     - name: Build the Docker image
-      run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend/
+      run: docker build -t ${{ env.IMAGE_NAME }}:latest ./backend-nestjs/
 
     - name: Configure Docker
       run: |
