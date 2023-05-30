@@ -1,0 +1,31 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": "."
+    },
+    {
+      "name": "Backend NestJS",
+      "path": "backend-nestjs"
+    },
+  ],
+  "settings": {
+    "eslint.format.enable": true,
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "files.eol": "\n",
+    "[json]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint"
+    ]
+  }
+}
