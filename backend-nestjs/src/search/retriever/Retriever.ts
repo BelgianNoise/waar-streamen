@@ -2,16 +2,17 @@ import { LRUCache } from 'lru-cache';
 import { Entry } from '../../models/Entry';
 import { Platform } from '../../models/Platform';
 import { SearchOptions } from '../../models/SearchOptions';
-import { Logger } from '@nestjs/common';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /**
  * Abstract class for retrieving entries from a given platform.
  */
 export abstract class Retriever {
-  protected readonly logger = new Logger(Retriever.name);
   private readonly enableCache: boolean;
 
   constructor(
+    @InjectPinoLogger(Retriever.name)
+    protected readonly logger: PinoLogger,
     protected readonly baseSearchUrl: string,
     public readonly platform: Platform,
     protected readonly cacheService: LRUCache<string, Entry[]>,

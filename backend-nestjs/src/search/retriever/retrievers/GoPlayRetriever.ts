@@ -5,14 +5,19 @@ import { parseLanguage } from '../../../models/Language';
 import parse from 'node-html-parser';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
 import { SearchOptions } from '../../../models/SearchOptions';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /**
  * Retrieves entries from GoPlay.
  */
 @Injectable()
 export class GoPlayRetriever extends Retriever {
-  constructor(protected readonly cacheService: EntriesLruCache) {
-    super('https://api.goplay.be/search', 'GoPlay', cacheService);
+  constructor(
+    @InjectPinoLogger(GoPlayRetriever.name)
+    protected readonly logger: PinoLogger,
+    protected readonly cacheService: EntriesLruCache,
+  ) {
+    super(logger, 'https://api.goplay.be/search', 'GoPlay', cacheService);
   }
 
   async retrieve(

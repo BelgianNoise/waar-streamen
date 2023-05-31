@@ -1,20 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { vtmGoParser } from '../../../util/functions/VtmGoParser';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
 import { SearchOptions } from '../../../models/SearchOptions';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /**
  * Retrieves entries from VTM Go.
  */
 @Injectable()
 export class VtmGoRetriever extends Retriever {
-  protected readonly logger = new Logger(VtmGoRetriever.name);
   private cookie: string;
 
-  constructor(protected readonly cacheService: EntriesLruCache) {
-    super('https://vtm.be/vtmgo/zoeken', 'VTM GO', cacheService);
+  constructor(
+    @InjectPinoLogger(VtmGoRetriever.name)
+    protected readonly logger: PinoLogger,
+    protected readonly cacheService: EntriesLruCache,
+  ) {
+    super(logger, 'https://vtm.be/vtmgo/zoeken', 'VTM GO', cacheService);
 
     this.cookie = `authId=${process.env.AUTH_VTMGO_AUTH_ID}`;
   }

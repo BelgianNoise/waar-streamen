@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import {
@@ -8,16 +8,20 @@ import {
 } from '../../variables/VrtMaxQueries';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
 import { SearchOptions } from '../../../models/SearchOptions';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /**
  * Retrieves entries from VRT MAX.
  */
 @Injectable()
 export class VrtMaxRetriever extends Retriever {
-  protected readonly logger = new Logger(VrtMaxRetriever.name);
-
-  constructor(protected readonly cacheService: EntriesLruCache) {
+  constructor(
+    @InjectPinoLogger(VrtMaxRetriever.name)
+    protected readonly logger: PinoLogger,
+    protected readonly cacheService: EntriesLruCache,
+  ) {
     super(
+      logger,
       'https://www.vrt.be/vrtnu-api/graphql/public/v1',
       'VRT MAX',
       cacheService,
@@ -26,7 +30,7 @@ export class VrtMaxRetriever extends Retriever {
 
   async retrieve(
     searchTerm: string,
-    searchOptions: SearchOptions
+    searchOptions: SearchOptions,
   ): Promise<Entry[]> {
     const result = await fetch(this.baseSearchUrl, {
       method: 'POST',
@@ -164,7 +168,7 @@ export class VrtMaxRetriever extends Retriever {
 
       return entry;
     } catch (e) {
-      this.logger.log(`Error occured while retrieving episode data:`, e);
+      this.logger.warn(`Error occured while retrieving episode data:`, e);
       return entry;
     }
   }

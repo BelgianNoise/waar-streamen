@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,8 @@ async function bootstrap() {
     // Host openapi on /api, /api-json and /api-yaml
     SwaggerModule.setup('api', app, document);
   }
+
+  app.useLogger(app.get(Logger));
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

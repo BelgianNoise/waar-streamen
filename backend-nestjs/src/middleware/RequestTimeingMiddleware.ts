@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class RequestTimeingMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(RequestTimeingMiddleware.name);
+  constructor(
+    @InjectPinoLogger(RequestTimeingMiddleware.name)
+    private readonly logger: PinoLogger,
+  ) {}
 
   use(request: Request, response: Response, next: NextFunction): void {
     const start = performance.now();

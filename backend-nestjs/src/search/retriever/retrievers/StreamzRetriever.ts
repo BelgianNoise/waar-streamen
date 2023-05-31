@@ -1,20 +1,29 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Entry } from '../../../models/Entry';
 import { Retriever } from '../Retriever';
 import { vtmGoParser } from '../../../util/functions/VtmGoParser';
 import { EntriesLruCache } from '../../cache/EntriesLruCache';
 import { SearchOptions } from '../../../models/SearchOptions';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /**
  * Retrieves entries from Streamz.
  */
 @Injectable()
 export class StreamzRetriever extends Retriever {
-  protected readonly logger = new Logger(StreamzRetriever.name);
   private cookie: string;
 
-  constructor(protected readonly cacheService: EntriesLruCache) {
-    super('https://www.streamz.be/streamz/zoeken', 'Streamz', cacheService);
+  constructor(
+    @InjectPinoLogger(StreamzRetriever.name)
+    protected readonly logger: PinoLogger,
+    protected readonly cacheService: EntriesLruCache,
+  ) {
+    super(
+      logger,
+      'https://www.streamz.be/streamz/zoeken',
+      'Streamz',
+      cacheService,
+    );
 
     this.cookie =
       `lfvp_auth_token=${process.env.AUTH_STREAMZ_AUTH_TOKEN}; ` +

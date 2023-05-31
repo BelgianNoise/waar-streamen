@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Entry } from '../../models/Entry';
 import { Retriever } from './Retriever';
 import { GoPlayRetriever } from './retrievers/GoPlayRetriever';
@@ -6,16 +6,18 @@ import { VtmGoRetriever } from './retrievers/VtmGoRetriever';
 import { StreamzRetriever } from './retrievers/StreamzRetriever';
 import { VrtMaxRetriever } from './retrievers/VrtMaxRetriever';
 import { SearchOptions } from '../../models/SearchOptions';
+import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 
 /**
  * Class that is responsible for retrieving entries from all platforms.
  */
 @Injectable()
 export class RetrieverManager {
-  private readonly logger = new Logger(RetrieverManager.name);
   private readonly retrievers: Retriever[];
 
   constructor(
+    @InjectPinoLogger(RetrieverManager.name)
+    private readonly logger: PinoLogger,
     private readonly goPlayRetriever: GoPlayRetriever,
     private readonly vtmGoRetriever: VtmGoRetriever,
     private readonly streamzRetriever: StreamzRetriever,
