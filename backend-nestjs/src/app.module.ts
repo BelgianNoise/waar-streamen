@@ -20,48 +20,49 @@ import { v4 } from 'uuid';
       pinoHttp: {
         level: 'debug',
         autoLogging: false,
-        genReqId: (request: IncomingMessage) => {
-          const requestIdHeader = request.headers['x-request-id'];
-          let requestId: string;
-          if (Array.isArray(requestIdHeader)) {
-            requestId = requestIdHeader[0];
-          } else if (requestIdHeader?.length) {
-            requestId = requestIdHeader;
-          } else {
-            requestId = v4();
-          }
+        // genReqId: (request: IncomingMessage) => {
+        //   const requestIdHeader = request.headers['x-request-id'];
+        //   let requestId: string;
+        //   if (Array.isArray(requestIdHeader)) {
+        //     requestId = requestIdHeader[0];
+        //   } else if (requestIdHeader?.length) {
+        //     requestId = requestIdHeader;
+        //   } else {
+        //     requestId = v4();
+        //   }
 
-          const correlationIdHeader = request.headers['x-correlation-id'];
-          let correlationId: string;
-          if (Array.isArray(correlationIdHeader)) {
-            correlationId = correlationIdHeader[0];
-          } else if (correlationIdHeader?.length) {
-            correlationId = correlationIdHeader;
-          } else {
-            correlationId = v4();
-          }
+        //   const correlationIdHeader = request.headers['x-correlation-id'];
+        //   let correlationId: string;
+        //   if (Array.isArray(correlationIdHeader)) {
+        //     correlationId = correlationIdHeader[0];
+        //   } else if (correlationIdHeader?.length) {
+        //     correlationId = correlationIdHeader;
+        //   } else {
+        //     correlationId = v4();
+        //   }
 
-          return { requestId, correlationId };
-        },
+        //   return { requestId, correlationId };
+        // },
         transport: {
           target: 'pino-pretty',
           options: {
             colorize: true,
             translateTime: true,
-            ignore: 'pid,hostname',
+            ignore: 'pid,hostname,context,reqId',
             messageFormat: `[{context}] {msg}`,
           },
         },
-        serializers: {
-          // This NEEDS to be named "req"
-          req: (req) => ({
-            requestId: req.id.requestId,
-            correlationId: req.id.correlationId,
-            url: req.url,
-            method: req.method,
-            host: req.headers.host,
-          }),
-        },
+        quietReqLogger: true,
+        // serializers: {
+        //   // This NEEDS to be named "req"
+        //   req: (req) => ({
+        //     requestId: req.id.requestId,
+        //     correlationId: req.id.correlationId,
+        //     url: req.url,
+        //     method: req.method,
+        //     host: req.headers.host,
+        //   }),
+        // },
       },
     }),
     SearchModule,
