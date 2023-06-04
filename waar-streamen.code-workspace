@@ -8,6 +8,10 @@
       "name": "Backend NestJS",
       "path": "backend-nestjs"
     },
+    {
+      "name": "Frontend SvelteKit",
+      "path": "frontend-sveltekit"
+    },
   ],
   "settings": {
     "eslint.format.enable": true,
