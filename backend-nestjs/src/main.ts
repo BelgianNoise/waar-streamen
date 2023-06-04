@@ -19,6 +19,7 @@ async function bootstrap() {
   }
 
   app.useLogger(app.get(Logger));
+  app.enableCors();
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
