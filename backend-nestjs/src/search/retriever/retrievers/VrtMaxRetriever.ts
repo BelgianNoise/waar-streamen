@@ -65,11 +65,15 @@ export class VrtMaxRetriever extends Retriever {
     if (!item) throw new Error('Response parsing failed (item)');
     const edges = item.components[0].paginatedItems.edges;
     const entries = edges.map((edge) => {
+      this.logger.info({
+        msg: 'hiere',
+        edge: edge,
+      });
       const entry: Entry = {
         platform: this.platform,
         title: edge.node.title,
         description: edge.node.description,
-        imageUrl: edge.node.image.templateUrl,
+        imageUrl: edge.node.image?.templateUrl,
         link: `https://www.vrt.be${edge.node.link}`,
         language: '-',
         seasons: new Map(),
@@ -168,7 +172,10 @@ export class VrtMaxRetriever extends Retriever {
 
       return entry;
     } catch (e) {
-      this.logger.warn(`Error occured while retrieving episode data:`, e);
+      this.logger.warn({
+        msg: `Error occured while retrieving episode data:`,
+        error: e,
+      });
       return entry;
     }
   }

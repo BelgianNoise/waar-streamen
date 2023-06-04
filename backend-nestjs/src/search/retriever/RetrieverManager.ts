@@ -35,10 +35,10 @@ export class RetrieverManager {
     searchTerm: string,
     searchOptions: SearchOptions,
   ): Promise<Entry[]> {
-    this.logger.debug(
-      `Searching for "${searchTerm}" with options:`,
-      searchOptions,
-    );
+    this.logger.debug({
+      msg: `Searching for "${searchTerm}" with options:`,
+      options: searchOptions,
+    });
     const retrieveAll = this.retrievers.map(async (r): Promise<Entry[]> => {
       const res = await r.search(searchTerm, searchOptions);
       this.logger.debug(`Retrieved ${res.length} entries from ${r.platform}`);
