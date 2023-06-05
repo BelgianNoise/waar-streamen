@@ -26,7 +26,7 @@
   on:click={() => window.open(entry.link, '_blank')}
 >
   <div class="image-container">
-    <img src={entry.imageUrl || "./poster-not-found.png"} alt="post image" loading="lazy">
+    <img src={entry.imageUrl || "./poster-not-found.png"} alt="poster" loading="lazy">
     {#if entry.language}
       <span class="language-flag">      
         {#if ['en'].includes(entry.language)}

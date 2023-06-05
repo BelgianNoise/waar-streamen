@@ -8,6 +8,10 @@
 
   let searchTerm: string = '';
 
+  const handleOnEnter = (e: KeyboardEvent) => {
+    if (e.key === "Enter") submitSearch();
+  }
+
   const submitSearch = () => {
     if (searchTerm.length >= 2) {
       doGetSearchResults(searchTerm);
@@ -43,11 +47,7 @@
       name="searchTerm"
       placeholder="blind gekocht"
       bind:value={searchTerm}
-      on:keydown={(e) => {
-        if (e.key === "Enter") {
-          submitSearch();
-        }
-      }}
+      on:keydown={handleOnEnter}
     >
   </div>
 </div>
