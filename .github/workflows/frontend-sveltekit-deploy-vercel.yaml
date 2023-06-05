@@ -11,6 +11,7 @@ on:
       - frontend-sveltekit/**
     branches:
       - main
+  workflow_dispatch:
 
 defaults:
   run:
