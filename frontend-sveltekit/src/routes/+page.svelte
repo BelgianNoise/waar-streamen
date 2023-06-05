@@ -6,7 +6,7 @@
   import Entry from "$lib/entry.svelte";
   import Welcome from "$lib/welcome.svelte";
 
-  let searchTerm: string = '';
+  let searchTerm = '';
 
   const handleOnEnter = (e: KeyboardEvent) => {
     if (e.key === "Enter") submitSearch();
