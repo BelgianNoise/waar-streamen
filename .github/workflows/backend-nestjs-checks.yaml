@@ -18,7 +18,7 @@ defaults:
 
 jobs:
 
-  build:
+  Checks:
     name: Install, build and lint
     runs-on: ubuntu-latest
 
