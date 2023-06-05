@@ -8,6 +8,7 @@
     "start": "turbo --continue --parallel start",
     "start:dev": "turbo --continue --parallel start:dev",
     "lint": "turbo lint --continue",
+    "lint:fix": "turbo lint --continue --fix",
     "test": "turbo test --concurrency=2 --continue"
   },
   "devDependencies": {
