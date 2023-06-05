@@ -19,7 +19,7 @@ defaults:
 jobs:
 
   build:
-    name: Install and build
+    name: Install, build and lint
     runs-on: ubuntu-latest
 
     steps:
