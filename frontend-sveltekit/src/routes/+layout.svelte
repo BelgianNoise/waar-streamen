@@ -4,6 +4,11 @@
 
 <script>
   import '../app.css';
+  import { inject } from '@vercel/analytics';
+
+  if (process.env.DEV === 'true') {
+    inject({ mode: 'production' });
+  }
 </script>
 
 <div class="content">

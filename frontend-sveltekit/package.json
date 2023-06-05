@@ -1,9 +1,9 @@
 {
 	"name": "waar-streamen-frontend-sveltekit",
 	"version": "0.0.1",
-  "author": "Arthur Joppart <arthur.joppart@gmail.com>",
-  "private": true,
-  "license": "UNLICENSED",
+	"author": "Arthur Joppart <arthur.joppart@gmail.com>",
+	"private": true,
+	"license": "UNLICENSED",
 	"scripts": {
 		"start:dev": "vite dev",
 		"build": "vite build",
@@ -26,5 +26,8 @@
 		"typescript": "^5.0.0",
 		"vite": "^4.3.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@vercel/analytics": "^1.0.1"
+	}
 }
