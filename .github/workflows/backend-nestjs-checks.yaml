@@ -1,4 +1,4 @@
-name: NestJS backend checks
+name: '[Backend NestJs] checks'
 
 on:
   push:

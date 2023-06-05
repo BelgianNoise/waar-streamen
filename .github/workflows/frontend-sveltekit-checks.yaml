@@ -1,4 +1,4 @@
-name: SvelteKit frontend checks
+name: '[Frontend SvelteKit] checks'
 
 on:
   push:
