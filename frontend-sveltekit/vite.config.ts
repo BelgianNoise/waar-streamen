@@ -5,5 +5,8 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
 		port: 4000,
-	}
+	},
+	define: {
+    'process.env': process.env
+  }
 });
