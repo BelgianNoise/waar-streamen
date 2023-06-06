@@ -49,6 +49,9 @@
       bind:value={searchTerm}
       on:keydown={handleOnEnter}
     >
+    <button on:click={submitSearch}>
+      Zoeken
+    </button>
   </div>
 </div>
 
@@ -93,18 +96,35 @@
     transform: translateY(-50%);
     max-height: 1rem;
     object-fit: contain;
+    display: none;
   }
   .header input {
     flex: 1;
-    padding: 10px 20px 10px 45px;
-    outline: none;
-    border: none;
-    border-radius: 20px;
+    /* Needs this for some reason */
+    width: 0px;
+    padding: 10px 20px;
+    border-radius: 20px 0 0 20px;
     background-color: rgba(80,80,80,0.4);
     font-size: 1.2rem;
+    border: 1px solid #eee;
   }
-  .header input:focus {
-    border: 1px solid #888;
+  @media only screen and (min-width: 500px) {
+    .header input {
+      padding-left: 45px;
+    }
+    .header .input-container img {
+      display: block;
+    }
+  }
+  .header button {
+    border-radius: 0 20px 20px 0;
+    color: #111;
+    background-color: #eee;
+    font-weight: bold;
+    padding: 0 20px 0 20px;
+  }
+  .header button:hover {
+    background-color: #ccc;
   }
 
   .service-group {
