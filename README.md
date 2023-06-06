@@ -15,7 +15,7 @@ Data returned by the server might not be correct, this is solely because the str
   - Language is never reported
 - [ ] NPO Start
 
-## Backend-NestJs (https://nestjs.waar-streamen.nasaj.be/api#/)
+## Backend NestJs (https://nestjs.waar-streamen.nasaj.be/)
 
 The backend is written in TypeScript using the [NestJS](https://nestjs.com/) framework. It uses a lru in memory cache to reduce load nad not make unnecessary requests.
 Adding new streaming services is also very easy, just create a new service that implements the `Retriever` interface and add it to the `SearchModule` and the `RetrieverManager`.
@@ -30,3 +30,7 @@ Estimates are:
  - `deep` (~ 600ms) : possible extra request(s) per program/movies found
  - `full` (> 1s): even more requests per program are possible
    - !! This can take a long time if your query is too broad !!
+
+## Frontend SvelteKit (https://waar-streamen.nasaj.be/)
+
+A mobile-first web app written in Svelte/Typescript, that provides a UI for the NestJs backend. The app is deployed on Vervel.
