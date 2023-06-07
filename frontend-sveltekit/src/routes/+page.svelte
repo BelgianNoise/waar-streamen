@@ -4,6 +4,7 @@
   import type { Entry as EntryType } from "../util/models/entry";
   import Entry from "$lib/entry.svelte";
   import Welcome from "$lib/welcome.svelte";
+    import Empty from "$lib/empty.svelte";
 
   let searchTerm = '';
 
@@ -55,19 +56,23 @@
 </div>
 
 {#if groupedSearchResults}
-  {#each orderedSearchResults as [platform, entries] (platform)}
-    <div class="service-group">
-      <div class="service-group-header">
-        <img src={`./${platform}-logo.png`} alt={`${platform} logo`}>
-        <span>{searchResultsAmountString(entries)}</span>
+  {#if Object.keys(groupedSearchResults).length}
+    {#each orderedSearchResults as [platform, entries] (platform)}
+      <div class="service-group">
+        <div class="service-group-header">
+          <img src={`./${platform}-logo.png`} alt={`${platform} logo`}>
+          <span>{searchResultsAmountString(entries)}</span>
+        </div>
+        <div class="entries">
+          {#each entries as entry (entry.link)}
+            <Entry {entry} />
+          {/each}
+        </div>
       </div>
-      <div class="entries">
-        {#each entries as entry (entry.link)}
-          <Entry {entry} />
-        {/each}
-      </div>
-    </div>
-  {/each}
+    {/each}
+  {:else}
+    <Empty />
+  {/if}
 {:else}
   <Welcome />
 {/if}

@@ -1,6 +1,7 @@
 import { loading } from "../../routes/loading-store";
 import { searchResults } from "../../routes/search-results-store";
 import { env } from "$env/dynamic/public";
+import { doGetRandomMeme } from "./do-get-random-meme";
 
 export const doGetSearchResults = async (
   searchTerm: string,
@@ -50,8 +51,10 @@ export const doGetSearchResults = async (
     } else {
       toAdd.push(...json);
     }
+    if (toAdd.length === 0) throw new Error();
     searchResults.update(() => toAdd);
   } catch {
+    doGetRandomMeme();
     searchResults.update(() => []);
   } finally {
     loading.update(() => false);
