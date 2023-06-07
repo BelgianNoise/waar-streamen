@@ -132,6 +132,7 @@
   .service-group img {
     max-height: 2rem;
     margin-left: 1rem;
+    max-width: 50%;
     object-fit: contain;
   }
   .service-group-header {
