@@ -65,10 +65,6 @@ export class VrtMaxRetriever extends Retriever {
     if (!item) throw new Error('Response parsing failed (item)');
     const edges = item.components[0].paginatedItems.edges;
     const entries = edges.map((edge) => {
-      this.logger.info({
-        msg: 'hiere',
-        edge: edge,
-      });
       const entry: Entry = {
         platform: this.platform,
         title: edge.node.title,
