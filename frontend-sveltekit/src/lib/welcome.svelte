@@ -33,6 +33,7 @@
     justify-content: center;
     width: 90%;
     margin: auto;
+    margin-bottom: 40px;
   }
   .platform-list img {
     max-height: 1.5rem;
