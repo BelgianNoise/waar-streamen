@@ -5,11 +5,17 @@
 <script>
   import '../app.css';
   import { inject } from '@vercel/analytics';
+  import { loading } from './loading-store';
+  import Loading from '$lib/loading.svelte';
 
   if (process.env.DEV !== 'true') {
     inject({ mode: 'production' });
   }
 </script>
+
+{#if $loading}
+  <Loading />
+{/if}
 
 <div class="content">
   <slot />

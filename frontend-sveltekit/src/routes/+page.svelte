@@ -1,7 +1,6 @@
 <script lang="ts">
   import { doGetSearchResults } from "../util/functions/do-get-search-results";
   import { searchResults } from "./search-results-store";
-  import { loading } from "./loading-store";
   import type { Entry as EntryType } from "../util/models/entry";
   import Entry from "$lib/entry.svelte";
   import Welcome from "$lib/welcome.svelte";
