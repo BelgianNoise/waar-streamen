@@ -19,6 +19,7 @@
     border-radius: 20px;
     background-color: #333;
     border: none;
+    outline: none;
     display: flex;
     flex-direction: column;
     align-items: center;
