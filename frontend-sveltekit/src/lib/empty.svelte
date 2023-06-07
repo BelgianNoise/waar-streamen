@@ -36,6 +36,7 @@
     gap: 20px;
     align-items: center;
     text-align: center;
+    padding-bottom: 40px;
   }
   img {
     max-width: 80%;
