@@ -8,7 +8,7 @@
   import { loading } from './loading-store';
   import Loading from '$lib/loading.svelte';
 
-  if (process.env.DEV !== 'true') {
+  if (process.env.ENABLE_ANALYTICS === 'true') {
     inject({ mode: 'production' });
   }
 </script>
