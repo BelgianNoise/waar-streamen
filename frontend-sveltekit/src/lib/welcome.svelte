@@ -2,9 +2,6 @@
 
 </script>
 
-<h3>
-  Typ hierboven jouw zoekterm in
-</h3>
 <hr>
 <h2>
   Deze streaming platformen worden ondersteund
