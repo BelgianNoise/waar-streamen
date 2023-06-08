@@ -14,10 +14,8 @@
 </div>
 
 <style>
-  h2, h3 {
-    text-align: center;
-  }
   h2 {
+    text-align: center;
     margin-bottom: 100px;
   }
 
