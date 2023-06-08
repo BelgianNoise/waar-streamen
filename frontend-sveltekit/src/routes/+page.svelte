@@ -4,9 +4,12 @@
   import type { Entry as EntryType } from "../util/models/entry";
   import Entry from "$lib/entry.svelte";
   import Welcome from "$lib/welcome.svelte";
-    import Empty from "$lib/empty.svelte";
+  import Empty from "$lib/empty.svelte";
+  import Toggler from "$lib/toggler.svelte";
+  import { exactMatchFilter } from "../util/functions/exact-match-filter";
 
   let searchTerm = '';
+  let exactMatch = true;
 
   const handleOnEnter = (e: KeyboardEvent) => {
     if (e.key === "Enter") submitSearch();
@@ -25,15 +28,31 @@
     return `${amount} zoekresultaten`;
   }
 
-  $: groupedSearchResults = $searchResults?.reduce((acc: Record<string, EntryType[]>, curr: EntryType) => {
+  const orderSearchResults = (
+    entries: EntryType[] | undefined,
+    exactMatch: boolean,
+  ): [ string, EntryType[] ][] => {
+    if (!entries) return [];
+
+    const filtered = exactMatch ? exactMatchFilter(searchTerm, entries) : entries;
+
+    const grouped = filtered.reduce((acc: Record<string, EntryType[]>, curr: EntryType) => {
       const platform = curr.platform.trim().replace(/\s/gmi, '').toLowerCase();
       if (!acc[platform]) acc[platform] = [];
       acc[platform].push(curr);
       return acc;
     }, {});
-  $: orderedSearchResults = Object.keys(groupedSearchResults || {}).reduce((acc: any[], curr: string) => {
-      return [ ... acc, [ curr, groupedSearchResults[curr] ] ];
-    }, []).sort((a, b) => b[1].length - a[1].length);
+
+    const ordered = Object.keys(grouped || {}).reduce((acc: any[], curr: string) => {
+      return [ ... acc, [ curr, grouped[curr] ] ];
+    }, []).sort((a, b) => b[1].length - a[1].length)
+
+    return ordered;
+  }
+
+  // include exactMatch to trigger when user toggles the checkbox
+  $: orderedSearchResults = orderSearchResults($searchResults, exactMatch);
+
 </script>
 
 <div class="header">
@@ -53,10 +72,29 @@
       Zoeken
     </button>
   </div>
+  <div class="input-container filters">
+    <span>Filters:</span>
+    <div
+      class="filter toggler"
+      on:click|preventDefault={() => exactMatch = !exactMatch}
+      on:keypress|preventDefault={() => exactMatch = !exactMatch}
+    >
+      <Toggler bind:checked={exactMatch} />
+      <span>Exact match</span>
+    </div>
+    <!-- <p>Sommige platformen geven ook resultaten die enkel op deel van de zoekterm matcht. Deze optie zorgt ervoor dat je die resultaten niet te zien krijgt</p> -->
+    <!-- <div class="filter">
+      <select>
+        <option value="full">full</option>
+        <option value="deep">deep</option>
+        <option value="shallow">shallow</option>
+      </select>
+    </div> -->
+  </div>
 </div>
 
-{#if groupedSearchResults}
-  {#if Object.keys(groupedSearchResults).length}
+{#if $searchResults}
+  {#if orderedSearchResults.length}
     {#each orderedSearchResults as [platform, entries] (platform)}
       <div class="service-group">
         <div class="service-group-header">
@@ -81,9 +119,9 @@
   .header {
     margin: auto;
     max-width: 1200px;
-    padding-bottom: 20px;
     display: flex;
     flex-direction: column;
+    gap: 20px;
     align-items: center;
     margin-bottom: 20px;
   }
@@ -92,6 +130,7 @@
     max-width: 800px;
     position: relative;
     display: flex;
+    justify-content: center;
   }
   .header .input-container img {
     position: absolute;
@@ -102,7 +141,7 @@
     object-fit: contain;
     display: none;
   }
-  .header input {
+  .header input[type="text"] {
     flex: 1;
     /* Needs this for some reason */
     width: 0px;
@@ -112,8 +151,9 @@
     font-size: 1.2rem;
     border: 1px solid #eee;
   }
+
   @media only screen and (min-width: 500px) {
-    .header input {
+    .header input[type="text"] {
       padding-left: 45px;
     }
     .header .input-container img {
@@ -158,5 +198,29 @@
       grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
       grid-gap: 10px;
     }
+  }
+  
+  .filters {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    align-items: center;
+    font-size: 1.2rem;
+  }
+  .filters > .filter {
+    padding: 10px 20px;
+    border-radius: 20px;
+    background-color: #333;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+  }
+  .filters > .filter:hover {
+    background-color: #555;
+  }
+  .filters > .filter.toggler {
+    cursor: pointer;
   }
 </style>

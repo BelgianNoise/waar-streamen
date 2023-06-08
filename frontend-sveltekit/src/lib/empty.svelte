@@ -2,6 +2,10 @@
   import { fly, scale } from "svelte/transition";
   import { randomMeme } from "../routes/random-meme-store";
   import { spin } from "$lib/transitions/spin";
+  import { onMount } from "svelte";
+  import { doGetRandomMeme } from "../util/functions/do-get-random-meme";
+
+  onMount(() => doGetRandomMeme());
 </script>
 
 <div
