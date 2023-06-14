@@ -7,6 +7,7 @@ import { GoPlayRetriever } from './retriever/retrievers/GoPlayRetriever';
 import { VtmGoRetriever } from './retriever/retrievers/VtmGoRetriever';
 import { StreamzRetriever } from './retriever/retrievers/StreamzRetriever';
 import { VrtMaxRetriever } from './retriever/retrievers/VrtMaxRetriever';
+import { RapidApiRetriever } from './retriever/retrievers/NetflixRetriever';
 
 @Module({
   controllers: [SearchController],
@@ -18,6 +19,7 @@ import { VrtMaxRetriever } from './retriever/retrievers/VrtMaxRetriever';
     VtmGoRetriever,
     StreamzRetriever,
     VrtMaxRetriever,
+    RapidApiRetriever,
   ],
 })
 export class SearchModule {}

@@ -7,6 +7,7 @@ import { StreamzRetriever } from './retrievers/StreamzRetriever';
 import { VrtMaxRetriever } from './retrievers/VrtMaxRetriever';
 import { SearchOptions } from '../../models/SearchOptions';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { RapidApiRetriever } from './retrievers/NetflixRetriever';
 
 /**
  * Class that is responsible for retrieving entries from all platforms.
@@ -22,12 +23,14 @@ export class RetrieverManager {
     private readonly vtmGoRetriever: VtmGoRetriever,
     private readonly streamzRetriever: StreamzRetriever,
     private readonly vrtMaxRetriever: VrtMaxRetriever,
+    private readonly netflixRetriever: RapidApiRetriever,
   ) {
     this.retrievers = [
       this.goPlayRetriever,
       this.vtmGoRetriever,
       this.streamzRetriever,
       this.vrtMaxRetriever,
+      this.netflixRetriever,
     ];
   }
 

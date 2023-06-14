@@ -167,10 +167,10 @@ export class VrtMaxRetriever extends Retriever {
       }
 
       return entry;
-    } catch (e) {
+    } catch (e: any) {
       this.logger.warn({
         msg: `Error occured while retrieving episode data:`,
-        error: e,
+        error: e.toString(),
       });
       return entry;
     }

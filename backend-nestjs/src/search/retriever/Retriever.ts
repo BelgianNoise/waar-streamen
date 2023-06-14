@@ -40,10 +40,10 @@ export abstract class Retriever {
       } else {
         return await this.retrieve(searchTerm, searchOptions);
       }
-    } catch (e: unknown) {
+    } catch (e: any) {
       this.logger.error({
         msg: `Error while searching "${searchTerm}"`,
-        error: e,
+        error: e.toString(),
       });
       return [
         {
