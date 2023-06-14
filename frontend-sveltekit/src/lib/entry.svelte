@@ -8,19 +8,11 @@
     .reduce((acc: number, curr: number[]) =>  acc + curr.length, 0);
 
   $: platform = entry.platform.trim().replace(/\s/gmi, '').toLowerCase()
-  $: vtmgo = platform === 'vtmgo'
-  $: vrtmax = platform === 'vrtmax'
-  $: goplay = platform === 'goplay'
-  $: streamz = platform === 'streamz'
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-  class="container"
-  class:vtmgo
-  class:vrtmax
-  class:goplay
-  class:streamz
+  class="container {platform}"
   in:slide={{ duration: 500 }}
   out:slide={{ duration: 500 }}
   on:click={() => window.open(entry.link, '_blank')}
@@ -85,6 +77,22 @@
   .container.streamz:hover {
     border-color: var(--color-streamz);
     background: linear-gradient(160deg, var(--color-streamz) 10%, rgba(80,80,80,0.5) 30%);
+  }
+  .container.netflix:hover {
+    border-color: var(--color-netflix);
+    background: linear-gradient(160deg, var(--color-netflix) 10%, rgba(80,80,80,0.5) 30%);
+  }
+  .container.apple:hover {
+    border-color: var(--color-apple);
+    background: linear-gradient(160deg, var(--color-apple) 10%, rgba(80,80,80,0.5) 30%);
+  }
+  .container.disney:hover {
+    border-color: var(--color-disney);
+    background: linear-gradient(160deg, var(--color-disney) 10%, rgba(80,80,80,0.5) 30%);
+  }
+  .container.prime:hover {
+    border-color: var(--color-prime);
+    background: linear-gradient(160deg, var(--color-prime) 10%, rgba(80,80,80,0.5) 30%);
   }
   .image-container {
     position: relative;

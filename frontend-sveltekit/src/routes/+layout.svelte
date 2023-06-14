@@ -41,6 +41,10 @@
     --color-goplay: #00F0C8;
     --color-vrtmax: #FF4942;
     --color-streamz: #020012;
+    --color-netflix: #E50914;
+    --color-apple: #FFFFFF;
+    --color-disney: #113CCF;
+    --color-prime: #00A8E1;
   }
   :global(html) {
     padding: 0;

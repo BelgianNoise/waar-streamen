@@ -11,6 +11,10 @@
   <img src="./goplay-logo.png" alt="goplay logo" loading="lazy">
   <img src="./streamz-logo.png" alt="streamz logo" loading="lazy">
   <img src="./vrtmax-logo.png" alt="vrt max logo" loading="lazy">
+  <img src="./netflix-logo.png" alt="netflix logo" loading="lazy">
+  <img src="./disney-logo.png" alt="disney plus logo" loading="lazy">
+  <img src="./prime-logo.png" alt="amazon prime video logo" loading="lazy">
+  <img src="./apple-logo.png" alt="apple tv plus logo" loading="lazy">
 </div>
 
 <style>
