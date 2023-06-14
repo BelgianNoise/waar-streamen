@@ -22,11 +22,11 @@ import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
  * Other platforms were a bonus
  */
 @Injectable()
-export class RapidApiRetriever extends Retriever {
+export class StreamingAvailabilityRetriever extends Retriever {
   private rapidAPIKey: string;
 
   constructor(
-    @InjectPinoLogger(RapidApiRetriever.name)
+    @InjectPinoLogger(StreamingAvailabilityRetriever.name)
     protected readonly logger: PinoLogger,
     protected readonly cacheService: EntriesLruCache,
   ) {
