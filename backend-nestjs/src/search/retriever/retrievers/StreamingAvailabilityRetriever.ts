@@ -59,7 +59,19 @@ export class StreamingAvailabilityRetriever extends Retriever {
     const json = await response.json();
 
     if (json.message) {
-      throw new Error(json.message);
+      this.logger.error(json.message);
+      return [
+        {
+          platform: 'RapidAPI',
+          title: 'Momenteel niet beschikbaar: Netflix, Prime, Apple, Disney',
+          description: '',
+          imageUrl:
+            'https://i1.sndcdn.com/artworks-000479787321-enu4ls-t500x500.jpg',
+          language: '-',
+          link: '',
+          seasons: new Map(),
+        },
+      ];
     }
 
     const filtered = json.result.filter((e: any) => e.streamingInfo?.be);
