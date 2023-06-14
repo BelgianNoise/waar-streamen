@@ -17,5 +17,7 @@ export const exactMatchFilter = (
     .replace(/'/gim, '')
     .replace(/\s+/gim, ' ')
     .includes(transformedSearchTerm));
-  return filtered;
+  const backendErrors = entries.filter((e) => e.title === 'backend-error');
+  const allRapidApi = entries.filter((e) => e.platform === 'RapidAPI');
+  return [...filtered, ...backendErrors, ...allRapidApi];
 };
