@@ -16,13 +16,18 @@ export const vtmGoParser = async (
   logger: PinoLogger,
 ): Promise<Entry[]> => {
   const parsed = parse(text);
-  const items = parsed.querySelectorAll(
-    'ol[data-title="Zoekresultaten"] .search__item',
-  );
+  const resultsBlock = parsed.querySelector('div.search__results-block');
+  if (!resultsBlock) {
+    return [];
+  }
+  const items = resultsBlock.querySelectorAll('li.search__item');
   const entries = items.map(async (item): Promise<Entry> => {
     const a: HTMLElement = item.querySelector('a') as unknown as HTMLElement;
     const link = a.getAttribute('href');
-    const title = a.getAttribute('data-title');
+    const titleH3 = a.querySelector(
+      'h3.teaser__title',
+    ) as unknown as HTMLElement;
+    const title = titleH3?.innerText;
     const img = a.querySelector('img.teaser__img');
     const imageUrl = img?.getAttribute('src') ?? '';
 
