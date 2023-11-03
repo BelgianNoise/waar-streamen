@@ -19,7 +19,10 @@ export const vtmGoParser = async (
   const parsed = parse(text);
   const resultsBlock = parsed.querySelector('div.search__results-block');
   if (!resultsBlock) {
-    logger.error(`No results block found ${{ text }}`);
+    logger.error({
+      msg: `No results block found`,
+      text,
+    });
     return [];
   }
   const items = resultsBlock.querySelectorAll('li.search__item');
