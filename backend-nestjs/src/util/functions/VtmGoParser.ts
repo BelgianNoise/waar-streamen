@@ -15,9 +15,11 @@ export const vtmGoParser = async (
   searchOptions: SearchOptions,
   logger: PinoLogger,
 ): Promise<Entry[]> => {
+  logger.debug('Parsing text for VTM OR Streamz', text.length, 'bytes');
   const parsed = parse(text);
   const resultsBlock = parsed.querySelector('div.search__results-block');
   if (!resultsBlock) {
+    logger.error('No results block found', { text });
     return [];
   }
   const items = resultsBlock.querySelectorAll('li.search__item');
